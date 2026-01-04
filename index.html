@@ -503,6 +503,36 @@ button:hover {
     font-family: "Times New Roman", Times, serif;
 }
 
+.action-box {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 20px;
+}
+
+#calc {
+    padding: 10px 22px;
+    font-size: 40px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    background: #2f80ed;
+    color: #fff;
+}
+
+#reset {
+    padding: 10px 22px;
+    font-size: 40px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    background: #d32f2f;
+    color: #fff;
+}
+
+#reset:hover {
+    background: #b71c1c;
+}
 
 
     </style>
@@ -544,8 +574,12 @@ button:hover {
             </div>
         </div>
 
-        <button id="calc">Xem kết quả</button>
+        <div class="action-box">
+    <button id="calc">Xem kết quả</button>
+    <button id="reset" type="button">Reset</button>
+</div>
 
+        
         <div class="result-box">
             <div class="result-title">Bát tự</div>
             <div class="bazi-grid" id="result">
@@ -1199,6 +1233,43 @@ function getZodiacCompatibility(zodiacName) {
         document.getElementById("viTri5").textContent = chi[4] || "";
         document.getElementById("viTri10").textContent = chi[9] || "";
     }
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+/* Năm → Tháng */
+document.getElementById("year").addEventListener("input", function () {
+    if (this.value.length === 4) {
+        document.getElementById("month").focus();
+    }
+});
+
+document.getElementById("month").addEventListener("input", function () {
+    const v = this.value;
+    if (v.length === 2) {
+        const n = Number(v);
+        if (n >= 1 && n <= 12) {
+            document.getElementById("day").focus();
+        }
+    }
+});
+
+document.getElementById("day").addEventListener("input", function () {
+    const v = this.value;
+    if (v.length === 2) {
+        const n = Number(v);
+        if (n >= 1 && n <= 31) {
+            document.getElementById("gio").focus();
+        }
+    }
+});
+
+/* Chọn Giờ → tự tính + cuộn xuống kết quả */
+document.getElementById("gio").addEventListener("change", function () {
+    
+});
+/* Chọn Giờ → nhảy xuống nút Xem Bát Tự */
+document.getElementById("gio").addEventListener("change", function () {
+    document.getElementById("calc").focus();
+});
 
    /////////////////////////////////////////////////////////////////////////////////////////////////
     const luongChiText = {
@@ -2509,7 +2580,26 @@ document.querySelector('.result-box').style.display = 'block';
         // Gán HÀM CHÍNH vào nút bấm (Chỉ gán một lần duy nhất)
         document.getElementById("calc").addEventListener("click", tinhTuTru);
     });
+   document.getElementById("reset").addEventListener("click", function () {
 
+    // Xóa input
+    document.getElementById("year").value = "";
+    document.getElementById("month").value = "";
+    document.getElementById("day").value = "";
+    document.getElementById("gio").selectedIndex = 0;
+
+    // Ẩn kết quả
+    document.getElementById("constellation-result").style.display = "none";
+    document.querySelector(".result-box").style.display = "none";
+
+    // Xóa text kết quả (nếu có)
+    document.querySelectorAll(".result-box span").forEach(el => el.textContent = "");
+
+    // Focus lại ô năm
+    document.getElementById("year").focus();
+});
+
+    
     </script>
 </body>
 </html>
