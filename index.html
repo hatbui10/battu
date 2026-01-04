@@ -1,0 +1,2515 @@
+<!doctype html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Tính Tứ Trụ Can Chi</title>
+    <style>
+        /* --- Biến CSS --- */
+        :root {
+            --bg-color: #2ecc71; /* Xanh lá cây nền ngoài */
+            --container-bg: #0044cc; /* Xanh dương container */
+            --text-color: #f0f0f0; /* Chữ trắng/sáng */
+            --primary-border: #27ae60; /* Viền xanh */
+            --input-bg: #e8f5e9;
+            --input-text: #111827;
+            --button-bg: #0ea5e9;
+            --button-text: red;
+            --result-box-bg: #FF8C00; /* Cam kết quả lớn */
+            --bazi-title-bg: #800080; /* Tím tiêu đề Bát Tự */
+            --bazi-result-bg: #ff0000; /* Đỏ khung Tứ Trụ */
+            --pill-bg: #e0f2fe;
+            --pill-text: #002855;
+        }
+
+        /* --- Global Reset & Body --- */
+        body {
+            font-family: system-ui, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            padding: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: var(--container-bg);
+            padding: 24px;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            position: relative; /* Căn giữa lại */
+            left: 0;
+        }
+
+        /* --- Phần Nhập Liệu --- */
+        .input-title {
+    font-weight: bold;
+    font-size: 20px;
+    color: var(--text-color);
+    
+    /* QUAN TRỌNG: Cần có max-width và margin: auto để căn giữa */
+    max-width: 500px; /* Nội dung sẽ không rộng quá 500px */
+    width: 90%;      /* Đảm bảo nó thu nhỏ khi màn hình nhỏ hơn 500px */
+    
+    border-radius: 20px;
+    padding: 10px;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+    
+    /* CĂN GIỮA NỘI DUNG VĂN BẢN (Chữ "Thiên Yết") */
+    text-align: center;
+    
+    /* CĂN GIỮA PHẦN TỬ (Khối Hộp) */
+    margin-left: auto;
+    margin-right: auto;
+    
+    /* THIẾT KẾ KHÁC (GIỮ LẠI) */
+    background: var(--bazi-result-bg);
+    border: 5px solid var(--primary-border);
+    
+    /* ĐÃ XÓA: position: relative; và left: 240px; */
+}
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            padding: 20px;
+            border-radius: 20px;
+            border: 5px solid var(--primary-border);
+            background: var(--bg-color);
+            margin-top: 20px;
+            margin-bottom: 50px;
+            
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Căn giữa label và input */
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            text-align: center;
+            margin-bottom: 0.5rem;
+            font-size: 30px;
+            position: relative;
+            top: -5px;
+            margin-top: 15px;
+            color: var(--input-text); /* Đổi màu chữ label để dễ đọc trên nền xanh lá */
+        }
+        
+        /* Cập nhật style cho label trong phần input-group để đồng bộ */
+        .input-grid label {
+            color: var(--input-text); /* Chữ đen trên nền xanh lá */
+        }
+
+        input, select {
+            width: 90%;
+            padding: 8px;
+            border: 5px solid #333;
+            border-radius: 6px;
+            margin-top: 4px;
+            font-size: 20px;
+            font-weight: bold;
+            background: var(--input-bg);
+            color: var(--input-text);
+            text-align: center;
+            box-sizing: border-box; /* Quan trọng để padding không làm tăng chiều rộng */
+        }
+
+button {
+    display: block;
+    margin: 0 auto 30px auto;
+    padding: 10px 30px;
+    background: var(--button-bg);
+    color: var(--button-text);
+    border: 5px solid #00f6ff;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 1.875rem;
+    font-style: italic;
+    font-weight: bold;
+    transition: background 0.3s, transform 0.2s ease;
+    
+    /* Hiệu ứng neon nhấp nháy */
+    animation: neonFlash 1.3s infinite alternate;
+}
+
+/* Hover: nhảy nhẹ + sáng mạnh */
+button:hover {
+    background: #0284c7;
+    transform: translateY(-6px);
+    animation: neonFlashHover 0.7s infinite alternate;
+}
+
+/* Keyframes — nhấp nháy neon */
+@keyframes neonFlash {
+    0% {
+        box-shadow:
+            0 0 6px #00f6ff,
+            0 0 12px #00f6ff,
+            0 0 20px #00e5ff;
+    }
+    100% {
+        box-shadow:
+            0 0 12px #00f6ff,
+            0 0 25px #00f6ff,
+            0 0 45px #00e5ff;
+    }
+}
+
+/* Hover nhấp nháy mạnh hơn */
+@keyframes neonFlashHover {
+    0% {
+        box-shadow:
+            0 0 10px #00f6ff,
+            0 0 20px #00f6ff,
+            0 0 35px #00e5ff;
+    }
+    100% {
+        box-shadow:
+            0 0 20px #00f6ff,
+            0 0 40px #00f6ff,
+            0 0 70px #00e5ff;
+    }
+}
+
+        /* --- Phần Kết Quả (Result Box) --- */
+        .result-box {
+            padding: 10px;
+            border-radius: 10px;
+            border: 5px solid var(--primary-border);
+            background: var(--result-box-bg);
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .result-title {
+            font-weight: bold;
+            font-style: italic;
+            width: 300px;
+            height: 50px;
+            font-size: 1.875rem;
+            color: #fff;
+            border-radius: 20px;
+            border: 5px solid #DC143C;
+            text-align: center;
+            margin: 18px auto 12px auto; /* Căn giữa tiêu đề */
+            background: var(--bazi-title-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Bảng Bát Tự */
+        .bazi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            padding: 20px;
+            border-radius: 20px;
+            border: 10px solid ;
+            background: #F44336;
+            margin-bottom: 50px;
+        }
+
+        .bazi-column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-width: 0;
+            height: 100%;
+            padding: 0;
+            
+
+        }
+        
+        .bazi-column label {
+            color: #fff; /* Chữ trắng trên nền đỏ */
+            margin-top: 0;
+            margin-bottom: 10px;
+           
+
+        }
+
+        .pill {
+            display: flex;
+            padding: 8px 12px;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: var(--pill-bg);
+            border-radius: 50px;
+             border: 5px solid ;
+            margin: 10px;
+            
+            width: 80%; /* Chiếm gần hết cột */
+            font-weight: bold;
+            font-size: 30px; /* 24px */
+            color: var(--pill-text);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* --- Bảng Kết Quả Chi Tiết (Table) --- */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 50px;
+            text-align: center;
+            
+            border-radius: 10px;
+            overflow: hidden; /* Quan trọng để bo góc hoạt động */
+        }
+        
+        table thead {
+            background: #333;
+            color: #fff;
+            font-weight: bold;
+        }
+        
+        table th, table td {
+            padding: 10px 5px;
+            border: 5px solid #333333;
+            vertical-align: middle;
+            color: #111827; /* Chữ đen/xám trên nền trắng */
+            background: #fff;
+            font-size: 20px;
+        }
+        
+        /* Màu chữ đặc biệt trong bảng */
+        #battru-table tbody tr td:first-child { color: red; font-weight: bold; }
+        #thapthan-table tbody tr td:first-child { color: blue; font-weight: bold; }
+        
+        /* --- Cân Lượng --- */
+        .canluong-total {
+            font-weight: bold;
+            font-size: 30px;
+            color: var(--input-text);
+            border-radius: 20px;
+            text-align: center;
+            background: var(--bg-color);
+            border: 5px solid #333333;
+            padding: 10px;
+            margin: 30px auto 10px auto; /* Căn giữa */
+            width: 30%;
+            min-width: 200px;
+        }
+
+        .canluong-result {
+            padding: 10px;
+            max-width: 100px;
+            border-radius: 10px;
+            border: 5px solid #333333;
+            background: #F5C857;
+            margin: 0 auto 50px auto; /* Căn giữa */
+            text-align: center;
+        }
+        
+        .canluong-result-text {
+            font-weight: bold; 
+            color: #007BFF; 
+            font-size: 30px; /* 18px */
+        }
+
+        /* Cập nhật màu chữ cho Chi Tiết Bát Tự */
+        #battru-table tbody tr td:nth-child(2),
+        #battru-table tbody tr td:nth-child(3),
+        #battru-table tbody tr td:nth-child(4) {
+             background: #f8f8f8;
+        }
+
+
+#constellation-result1 {
+    padding: 20px;
+    border: 10px solid #e0e0e0;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Thêm bóng nhẹ */
+    margin-bottom: 20px;
+    background-color: #DDC57A;
+    font-family: Arial, sans-serif;
+}
+/* Bảng Chi Tiết Tương Hợp */
+#compatibility-details1  {                  /*     bảng tương hợp*/ 
+    padding: 30px 35px;
+    text-align: center; /* Căn giữa cho giá trị để dễ đọc danh sách cung */
+    border: 10px solid #ccc;   /*  viền   bảng tương hợp*/ 
+
+    background-color: red;
+    font-size: 30px;
+    font-weight: 900;
+    font-family: "Times New Roman", Times, serif;
+
+}
+#compatibility-details1 thead th {  /* màu của tiêu đề thông tin tương hợp cơ bản...*/
+    background-color: #556B2F;
+    color: #fff;
+    padding: 10px;
+    font-size: 30px;
+    text-align: center;
+    border: 5px solid #333;  /* màu viền của hộp chứa tiêu đề thông tin tương hợp cơ bản...*/
+
+}
+
+#compatibility-details1 tbody tr {
+    transition: background-color 0.3s ease;
+    
+}
+
+
+#compatibility-details1 tbody tr:hover {
+    background-color: #556B2F;
+    
+}
+
+
+
+/* Khung bên ngoài nền đỏ của chòm sao */
+#constellation-result {
+    padding: 20px;
+    border: 10px solid #ccc;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Thêm bóng nhẹ */
+    margin-bottom: 20px;
+    background-color: red;
+    font-family: Arial, sans-serif;
+}
+
+/* khung Tiêu đề Chòm sao thiên thần và tổng cân lượng */
+.constellation-title {
+  font-size: 1.4em;
+  font-weight: 700; /* bỏ px */
+  color: #ffffff;
+  margin-bottom: 15px;
+  border: 10px solid #333;
+  padding-bottom: 10px;
+  text-align: center; /* giúp chữ nằm giữa tiêu đề */
+}
+
+/* khung Hiển thị tên cung và khoảng ngày */
+.constellation-info {
+  text-align: center;
+  font-size: 1.4em;
+  font-weight: 300; /* bỏ px */
+  color: #ffffff;
+  margin: 0 auto 20px; /* căn giữa & cách dưới 20px */
+  border: 5px solid #ccc;
+  padding: 10px 0;
+  width: 30%;
+  border-radius: 50px;
+  background-color: #333;
+  }
+
+/* Tên cung */
+.constellation-name {
+  font-size: 30px;
+  font-weight: 900; /* bỏ px */
+  color: #fff;
+  line-height: 1.8;
+  font-family: "Times New Roman", Times, serif;
+  margin: 0 auto;
+  text-align: center; /* giúp chữ nằm giữa tiêu đề */
+}
+.constellation-date {
+    font-size: 0.9em;
+    color: #87CEFA;
+    margin-top: 5px;
+}
+
+
+
+
+/* Bảng Chi Tiết Tương Hợp */
+#compatibility-details  {                  /*     bảng tương hợp*/ 
+    padding: 30px 35px;
+    text-align: center; /* Căn giữa cho giá trị để dễ đọc danh sách cung */
+    border: 10px solid #ccc;   /*  viền   bảng tương hợp*/ 
+
+    background-color: #7CFC00;
+    font-size: 30px;
+    font-weight: 900;
+    font-family: "Times New Roman", Times, serif;
+
+}
+
+#compatibility-details thead th {  /* màu của tiêu đề thông tin tương hợp cơ bản...*/
+    background-color: #556B2F;
+    color: #fff;
+    padding: 10px;
+    font-size: 30px;
+    text-align: center;
+    border: 5px solid #333;  /* màu viền của hộp chứa tiêu đề thông tin tương hợp cơ bản...*/
+
+}
+
+#compatibility-details tbody tr {
+    transition: background-color 0.3s ease;
+    
+}
+
+#moTaLuongChi {
+    background-color: #FFEE91;
+}
+
+#compatibility-details tbody tr:hover {
+    background-color: #556B2F;
+    
+}
+
+#compatibility-details .label {  /*    thông tin bên trái trong bảng tương hợp*/ 
+    background-color: #98FB98; /* Nền nhẹ cho nhãn */
+    font-weight: 600;
+    padding: 10px 15px;
+    text-align: left;
+    width: 45%;
+    font-size: 30px;
+    border: 5px solid #333; /* màu viền của hộp bên trái tiêu đề thông tin tương hợp cơ bản...*/
+    color: #555;
+}
+
+#compatibility-details .value { /*    thông tin bên phải trong bảng tương hợp*/ 
+    padding: 10px 15px;
+    text-align: center; /* Căn trái cho giá trị để dễ đọc danh sách cung */
+    border: 5px solid #333;
+    background-color: #ADD8E6;
+    font-size: 30px;
+    font-weight: 900;
+    font-family: "Times New Roman", Times, serif;
+
+}
+
+/* Tô màu cho các trường quan trọng */
+.value {
+    color: #c0392b; /* Đỏ đậm cho Hôn nhân */
+    font-family: "Times New Roman", Times, serif;
+}
+
+.love-match {
+    color: #c0392b; /* Đỏ đậm cho Hôn nhân */
+    font-family: "Times New Roman", Times, serif;
+}
+
+.work-match {
+    color: #27ae60; /* Xanh lá cây cho Công việc */
+    font-family: "Times New Roman", Times, serif;
+}
+
+.conflict {
+    color: #8e44ad; /* Tím đậm cho Cung khắc */
+    font-style: italic;
+    font-family: "Times New Roman", Times, serif;
+}
+
+
+
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        
+        <div class="input-title">Nhập ngày tháng năm sinh (dương lịch)</div>
+        <div class="input-grid">
+            <div class="input-group">
+                <label for="year">Năm</label>
+                <input type="number" id="year" placeholder="VD: 1995" min="1900" max="2100">
+            </div>
+            <div class="input-group">
+                <label for="month">Tháng</label>
+                <input type="number" id="month" placeholder="1-12" min="1" max="12">
+            </div>
+            <div class="input-group">
+                <label for="day">Ngày</label>
+                <input type="number" id="day" placeholder="1-31" min="1" max="31">
+            </div>
+            <div class="input-group">
+                <label for="gio">Giờ sinh</label>
+                <select id="gio">
+                    <option value="Tý">Tý (23h–1h)</option>
+                    <option value="Sửu">Sửu (1h–3h)</option>
+                    <option value="Dần">Dần (3h–5h)</option>
+                    <option value="Mão">Mão (5h–7h)</option>
+                    <option value="Thìn">Thìn (7h–9h)</option>
+                    <option value="Tỵ">Tỵ (9h–11h)</option>
+                    <option value="Ngọ">Ngọ (11h–13h)</option>
+                    <option value="Mùi">Mùi (13h–15h)</option>
+                    <option value="Thân">Thân (15h–17h)</option>
+                    <option value="Dậu">Dậu (17h–19h)</option>
+                    <option value="Tuất">Tuất (19h–21h)</option>
+                    <option value="Hợi">Hợi (21h–23h)</option>
+                </select>
+            </div>
+        </div>
+
+        <button id="calc">Xem kết quả</button>
+
+        <div class="result-box">
+            <div class="result-title">Bát tự</div>
+            <div class="bazi-grid" id="result">
+                <div class="bazi-column">
+                    <label>Năm</label>
+                    <div class="pill" id="res-nam">...</div>
+                    <div class="pill" id="am-nam">...</div>
+                </div>
+                <div class="bazi-column">
+                    <label>Tháng</label>
+                    <div class="pill" id="res-thang">...</div>
+                    <div class="pill" id="am-thang">...</div>
+                </div>
+                <div class="bazi-column">
+                    <label>Ngày</label>
+                    <div class="pill" id="res-ngay">...</div>
+                    <div class="pill" id="am-ngay">...</div>
+                </div>
+                <div class="bazi-column">
+                    <label>Giờ</label>
+                    <div class="pill" id="res-gio">...</div>
+                    <div class="pill" id="am-gio">...</div>
+                </div>
+            </div>
+
+
+
+            <div class="result-title">Chi Tiết Bát tự</div>
+<table id="battru-table" cellspacing="0" cellpadding="8">
+    <thead>
+        <tr>
+            <th>Trụ</th>
+            <th>Năm</th>
+            <th>Tháng</th>
+            <th>Ngày</th>
+            <th>Giờ</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Đại diện cho </td>
+            <td>Gốc cây</td>
+            <td>Cành cây</td>        
+            <td>Hoa lá</td>
+            <td>Quả</td>
+            </tr>
+
+        <tr>
+            <td>Can</td>
+            <td id="can-nam">...</td>
+            <td id="can-thang">...</td>
+            <td id="can-ngay">...</td>
+            <td id="can-gio">...</td>
+        </tr>
+        <tr>
+            <td>Chi</td>
+            <td id="chi-nam">...</td>
+            <td id="chi-thang">...</td>
+            <td id="chi-ngay">...</td>
+            <td id="chi-gio">...</td>
+        </tr>
+        <tr>
+            <td>Tàng Can</td>
+            <td id="tangcan-nam">...</td>
+            <td id="tangcan-thang">...</td>
+            <td id="tangcan-ngay">...</td>
+            <td id="tangcan-gio">...</td>
+        </tr>
+        <tr>
+            <td>Nạp Âm</td>
+            <td id="napam-nam">...</td>
+            <td id="napam-thang">...</td>
+            <td id="napam-ngay">...</td>
+            <td id="napam-gio">...</td>
+        </tr>
+        <tr>
+            <td>Hôn nhân mỹ mãn với tuổi</td>
+            <td id="thdh-namm">...</td>
+            <th>Rất khó <br>chia lìa</th>
+            <th>Ít khi <br>mâu thuẫn</th>
+            <th>Ngày càng<br> hạnh phúc</th>
+      
+        </tr>
+        <tr>
+            <td>Cực kỳ xung khắc với tuổi</td>
+            <td id="ketqua1">...</td>
+            <th>Rất dễ <br>chia lìa</th>
+            <th>Thường xuyên <br> mâu thuẫn</th>
+            <th>Ngày càng<br> rạn nứt</th>
+      
+        </tr>
+         
+
+
+    </tbody>
+</table>
+
+            <div class="result-title">Thập Thần</div>
+            <table id="thapthan-table" cellspacing="0" cellpadding="8">
+                <thead>
+                    <tr>
+                        <th>Trụ</th>
+                        <th>Năm</th>
+                        <th>Tháng</th>
+                        <th>Ngày</th>
+                        <th>Giờ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Thập Thần Can</td>
+                        <td id="than-can-nam">...</td>
+                        <td id="than-can-thang">...</td>
+                        <td id="than-can-ngay">...</td>
+                        <td id="than-can-gio">...</td>
+                    </tr>
+                    <tr>
+                        <td>Trường Sinh của Chi</td>
+                        <td id="truong-sinh-nam">...</td>
+                        <td id="truong-sinh-thang">...</td>
+                        <td id="truong-sinh-ngay">...</td>
+                        <td id="truong-sinh-gio">...</td>
+                    </tr>
+                    <tr>
+                        <td>Quyết định quan trọng</td>
+                        <td id="ket-qua-0">Vượng ở </td>
+                        <th id="viTri5">...</th>
+                        <td id="ket-qua-1">Tuyệt ở</td>
+                        <th id="viTri10">...</th>
+                    </tr>
+                    <tr>
+                        <td>Thập Thần Tàng Can</td>
+                        <td id="than-tangcan-nam">...</td>
+                        <td id="than-tangcan-thang">...</td>
+                        <td id="than-tangcan-ngay">...</td>
+                        <td id="than-tangcan-gio">...</td>
+                    </tr>
+                </tbody>
+            </table>
+        
+            <div class="result-title">Âm Dương xô lệch </div>
+            <table id="thapthan-table" cellspacing="0" cellpadding="8">
+                <tbody>
+                    <tr>
+                        <td>Trong Can ngày có</td>
+                        <td>Tân Mão</td>
+                        <td>Nhâm Thìn</td>
+                        <td>Quý Tỵ</td>
+                         <td>Tân Dậu </td>
+                        <td>Nhâm Tuất</td>
+                        <td>Quý Hợi</td>
+                    </tr>
+                    <tr>
+                        <td>Rất kỵ hôn nhân</td>
+                        <td>Bính Ngọ</td>
+                        <td>Đinh Mùi</td>
+                        <td>Mậu Thân</td>
+                       <td>Bính Tý</td>
+                        <td>Đinh Sửu</td>
+                        <td>Mậu Dần </td>
+                    </tr>
+                </tbody>
+                
+            </table>
+            
+            <div id="result-title" class="result-title">Thiên - địa</div>
+            <table id="thapthan-table" cellspacing="0" cellpadding="8">
+            
+               <thead>
+    <tr>
+        <th style="color:#F79A19; font-weight:bold; font-size:30px;">Loại</th>
+        <th style="color:#F79A19; font-weight:bold; font-size:30px;">Năm</th>
+        <th style="color:#F79A19; font-weight:bold; font-size:30px;">Tháng</th>
+        <th style="color:#F79A19; font-weight:bold; font-size:30px;">Ngày</th>
+        <th style="color:#F79A19; font-weight:bold; font-size:30px;">Giờ</th>
+    </tr>
+</thead>
+                <tbody>
+    <tr>
+      <td>Thiên khắc<br> địa xung</td>
+      <th id="tkdx-nam">...</th>
+      <th id="tkdx-thang">...</th>
+      <th id="tkdx-ngay">...</th>
+      <th id="tkdx-gio">...</th>
+    </tr>
+    <tr>
+      <td>Thiên hợp<br> địa hợp</td>
+      <th id="thdh-nam">...</th>
+      <th id="thdh-thang">...</th>
+      <th id="thdh-ngay">...</th>
+      <th id="thdh-gio">...</th>
+    </tr>
+    <tr>
+      <td>Thai nguyên <br>tháng sinh</td>
+      <td>...</td>
+      <td id="ketqua">...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    
+    <tr>
+      <td> Nạp âm<br> Thai nguyên</td>
+      <td>...</td>
+      <th id="napam-thai">...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+   
+   <tr>
+      <td> Cung phi <br>bát quái</td>
+      <td>^Nam^</td>
+      <th id="cung-nam">...</th>
+      <td>^Nữ^</td>
+       <th id="cung-nu">...</th>
+    </tr>
+    <tr>
+      <td> Hợp với<br> người tuổi </td>
+      <td>^Nam hoặc Nữ ^</td>
+      <th id="cung-nam1">...</th>
+      <td>^Nữ hoặc Nam^</td>
+       <th id="cung-nu1">...</th>
+    </tr>
+
+    <tr>
+    <td>Để có <br>mệnh tốt cần phải</td>
+    <td id="ketqua5" colspan="4" style="color:#BBC863; font-weight:bold; font-size:30px;"></td>
+
+    </tr>
+    
+    <tr>
+    <td>Mệnh này: </td>
+    <th id="ketQua7" colspan="4"> </th>
+    </tr>
+
+    <tr>
+    <td>Cung</td>
+    <th id="cung-nam2"></th>
+    <th id="mo-ta-cung" colspan="4"></th>
+    </tr>
+    
+    <tr>
+    <td>Sinh giờ </td>
+    <th id="ketQuaChi"></th>
+    <th id="ketQuaMoTa" colspan="4"></th>
+    </tr>
+    
+    <tr>
+    
+    <th>
+    Tuổi <br><span id="chi-nam1"></span> <br>sinh giờ <br><span id="chi-gio1"></span>
+    </th>
+    <th id="ketQuaGioTheoTuoi" colspan="4"></th>
+    </tr>
+
+
+
+  </tbody>
+            </table>
+
+
+
+            <div id="constellation-result1" class="result-card">
+    <div class="header">
+        <div class="result-title constellation-title">
+            <span class="icon">✨</span>Tổng cân lượng:</div>
+        
+        <div class="canluong-result">
+                <div id="ketQuaInput" class="canluong-result-text">0</div>
+            </div>
+    </div>
+
+    <table id="compatibility-details1" class="compatibility-table" ">
+        <thead>
+            <tr>
+                <th colspan="2">Ý nghĩa </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                   <td id="moTaLuongChi" style="margin-top:10px; line-height:1.5;" ></td> 
+            </tr>
+            
+        </tbody>
+    </table>
+</div>
+            
+            
+            
+
+<div id="constellation-result" class="result-card">
+    <div class="header">
+        <div class="result-title constellation-title">
+            <span class="icon">✨</span>Chòm Sao Thiên thần</div>
+        
+        <div class="constellation-info">
+            <div class="constellation-name" id="constellation-name">...</div>
+            <div class="constellation-date" id="constellation-date-range">...</div>
+        </div>
+    </div>
+
+    <table id="compatibility-details" class="compatibility-table">
+        <thead>
+            <tr>
+                <th colspan="2">Thông Tin Tương Hợp Cơ Bản</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="label">Nguyên Tố</td>
+                <td id="zodiac-element" class="value"></td>
+            </tr>
+            <tr>
+                <td class="label">Hợp Hôn Nhân (Tình Cảm)</td>
+                <td id="zodiac-love" class="value match love-match"></td>
+            </tr>
+            <tr>
+                <td class="label">Hợp Công Việc (Bạn Bè)</td>
+                <td id="zodiac-work" class="value match work-match"></td>
+            </tr>
+            <tr>
+                <td class="label">Cung Khắc (Cần Lưu Ý)</td>
+                <td id="zodiac-conflict" class="value conflict"></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="result-box" style="display: none;">
+    </div>            
+            
+            
+        </div>
+            
+            
+            
+            
+        </div>
+    </div>
+    
+    <script>
+    // =========================================================================
+    // I. DỮ LIỆU CỐ ĐỊNH (CONSTANTS / DATA)
+    // =========================================================================
+
+    const CAN = ["Giáp", "Ất", "Bính", "Đinh", "Mậu", "Kỷ", "Canh", "Tân", "Nhâm", "Quý"];
+    const CHI = ["Tý", "Sửu", "Dần", "Mão", "Thìn", "Tỵ", "Ngọ", "Mùi", "Thân", "Dậu", "Tuất", "Hợi"];
+    const ids = ["nam", "thang", "ngay", "gio"]; // IDs dùng để hiển thị kết quả
+
+    const CHI_TO_HOUR = {
+        "Tý": 23, "Sửu": 1, "Dần": 3, "Mão": 5, "Thìn": 7, "Tỵ": 9,
+        "Ngọ": 11, "Mùi": 13, "Thân": 15, "Dậu": 17, "Tuất": 19, "Hợi": 21
+    };
+
+    const TANG_CAN = {
+        "Tý": ["Quý"], "Sửu": ["Kỷ", "Quý", "Tân"], "Dần": ["Giáp", "Bính", "Mậu"],
+        "Mão": ["Ất"], "Thìn": ["Mậu", "Ất", "Quý"], "Tỵ": ["Bính", "Mậu", "Canh"],
+        "Ngọ": ["Đinh", "Kỷ"], "Mùi": ["Kỷ", "Đinh", "Ất"], "Thân": ["Canh", "Nhâm", "Mậu"],
+        "Dậu": ["Tân"], "Tuất": ["Mậu", "Tân", "Đinh"], "Hợi": ["Nhâm", "Giáp"]
+    };
+
+    const CAN_NGUHANH = {
+        "Giáp": "(+ Mộc)", "Ất": "(- Mộc)", "Bính": "(+ Hỏa)", "Đinh": "(- Hỏa)",
+        "Mậu": "(+ Thổ)", "Kỷ": "(- Thổ)", "Canh": "(+ Kim)", "Tân": "(- Kim)",
+        "Nhâm": "(+ Thủy)", "Quý": "(- Thủy)"
+    };
+
+    const CHI_NGUHANH = {
+        "Tý": "(+ Thủy)", "Sửu": "(- Thổ)", "Dần": "(+ Mộc)", "Mão": "(- Mộc)", "Thìn": "(+ Thổ)",
+        "Tỵ": "(- Hỏa)", "Ngọ": "(+ Hỏa)", "Mùi": "(- Thổ)", "Thân": "(+ Kim)", "Dậu": "(- Kim)",
+        "Tuất": "(+ Thổ)", "Hợi": "(- Thủy)"
+    };
+
+// Bảng Thiên Khắc & Địa Xung cố định
+const canKhacMap = {Giáp:'Mậu',Ất:'Kỷ',Bính:'Canh',Đinh:'Tân',Mậu:'Giáp',Kỷ:'Ất',Canh:'Bính',Tân:'Đinh',Nhâm:'Quý',Quý:'Nhâm'};
+const chiXungMap = {Tý:'Hợi',Sửu:'Mùi',Dần:'Thân',Mão:'Dậu',Thìn:'Tuất',Tỵ:'Hợi',Ngọ:'Tý',Mùi:'Sửu',Thân:'Dần',Dậu:'Mão',Tuất:'Thìn',Hợi:'Tỵ'};
+
+
+    // Dữ liệu Cung Hoàng Đạo
+    // Thay thế DỮ LIỆU Cung Hoàng Đạo (const zodiacs) bằng dữ liệu chi tiết hơn này:
+const zodiacs = [
+  { name: "Bạch Dương", start: "03-21", end: "04-19", range: "21/03 - 19/04", element: "Lửa",
+    love: "Sư Tử (23/07 - 22/08), Nhân Mã (22/11 - 21/12)",
+    work: "Song Tử (21/05 - 21/06), Bảo Bình (20/01 - 18/02)",
+    conflict: "Thiên Bình (23/09 - 23/10), Ma Kết (22/12 - 19/01), Cự Giải (22/06 - 22/07)" },
+
+  { name: "Kim Ngưu", start: "04-20", end: "05-20", range: "20/04 - 20/05", element: "Đất",
+    love: "Xử Nữ (23/08 - 22/09), Ma Kết (22/12 - 19/01)",
+    work: "Cự Giải (22/06 - 22/07), Song Ngư (19/02 - 20/03)",
+    conflict: "Thiên Yết (24/10 - 21/11), Sư Tử (23/07 - 22/08), Bảo Bình (20/01 - 18/02)" },
+
+  { name: "Song Tử", start: "05-21", end: "06-21", range: "21/05 - 21/06", element: "Khí",
+    love: "Thiên Bình (23/09 - 23/10), Bảo Bình (20/01 - 18/02)",
+    work: "Bạch Dương (21/03 - 19/04), Sư Tử (23/07 - 22/08)",
+    conflict: "Nhân Mã (22/11 - 21/12), Song Ngư (19/02 - 20/03), Xử Nữ (23/08 - 22/09)" },
+
+  { name: "Cự Giải", start: "06-22", end: "07-22", range: "22/06 - 22/07", element: "Nước",
+    love: "Thiên Yết (24/10 - 21/11), Song Ngư (19/02 - 20/03)",
+    work: "Kim Ngưu (20/04 - 20/05), Xử Nữ (23/08 - 22/09)",
+    conflict: "Ma Kết (22/12 - 19/01), Bạch Dương (21/03 - 19/04), Thiên Bình (23/09 - 23/10)" },
+
+  { name: "Sư Tử", start: "07-23", end: "08-22", range: "23/07 - 22/08", element: "Lửa",
+    love: "Bạch Dương (21/03 - 19/04), Nhân Mã (22/11 - 21/12)",
+    work: "Song Tử (21/05 - 21/06), Thiên Bình (23/09 - 23/10)",
+    conflict: "Bảo Bình (20/01 - 18/02), Thiên Yết (24/10 - 21/11), Kim Ngưu (20/04 - 20/05)" },
+
+  { name: "Xử Nữ", start: "08-23", end: "09-22", range: "23/08 - 22/09", element: "Đất",
+    love: "Kim Ngưu (20/04 - 20/05), Ma Kết (22/12 - 19/01)",
+    work: "Cự Giải (22/06 - 22/07), Thiên Yết (24/10 - 21/11)",
+    conflict: "Song Ngư (19/02 - 20/03), Nhân Mã (22/11 - 21/12), Song Tử (21/05 - 21/06)" },
+
+  { name: "Thiên Bình", start: "09-23", end: "10-23", range: "23/09 - 23/10", element: "Khí",
+    love: "Song Tử (21/05 - 21/06), Bảo Bình (20/01 - 18/02)",
+    work: "Sư Tử (23/07 - 22/08), Nhân Mã (22/11 - 21/12)",
+    conflict: "Bạch Dương (21/03 - 19/04), Cự Giải (22/06 - 22/07), Ma Kết (22/12 - 19/01)" },
+
+  { name: "Thiên Yết", start: "10-24", end: "11-21", range: "24/10 - 21/11", element: "Nước",
+    love: "Cự Giải (22/06 - 22/07), Song Ngư (19/02 - 20/03)",
+    work: "Xử Nữ (23/08 - 22/09), Ma Kết (22/12 - 19/01)",
+    conflict: "Kim Ngưu (20/04 - 20/05), Bảo Bình (20/01 - 18/02), Sư Tử (23/07 - 22/08)" },
+
+  { name: "Nhân Mã", start: "11-22", end: "12-21", range: "22/11 - 21/12", element: "Lửa",
+    love: "Bạch Dương (21/03 - 19/04), Sư Tử (23/07 - 22/08)",
+    work: "Thiên Bình (23/09 - 23/10), Bảo Bình (20/01 - 18/02)",
+    conflict: "Song Tử (21/05 - 21/06), Xử Nữ (23/08 - 22/09), Song Ngư (19/02 - 20/03)" },
+
+  { name: "Ma Kết", start: "12-22", end: "01-19", range: "22/12 - 19/01", element: "Đất",
+    love: "Kim Ngưu (20/04 - 20/05), Xử Nữ (23/08 - 22/09)",
+    work: "Thiên Yết (24/10 - 21/11), Song Ngư (19/02 - 20/03)",
+    conflict: "Cự Giải (22/06 - 22/07), Bạch Dương (21/03 - 19/04), Thiên Bình (23/09 - 23/10)" },
+
+  { name: "Bảo Bình", start: "01-20", end: "02-18", range: "20/01 - 18/02", element: "Khí",
+    love: "Song Tử (21/05 - 21/06), Thiên Bình (23/09 - 23/10)",
+    work: "Bạch Dương (21/03 - 19/04), Nhân Mã (22/11 - 21/12)",
+    conflict: "Sư Tử (23/07 - 22/08), Kim Ngưu (20/04 - 20/05), Thiên Yết (24/10 - 21/11)" },
+
+  { name: "Song Ngư", start: "02-19", end: "03-20", range: "19/02 - 20/03", element: "Nước",
+    love: "Cự Giải (22/06 - 22/07), Thiên Yết (24/10 - 21/11)",
+    work: "Ma Kết (22/12 - 19/01), Kim Ngưu (20/04 - 20/05)",
+    conflict: "Xử Nữ (23/08 - 22/09), Song Tử (21/05 - 21/06), Nhân Mã (22/11 - 21/12)" }
+];
+    // BẢNG THẬP THẦN
+    const bangThapThan = {
+        "Giáp": { "Mậu": "Chính Tài", "Kỷ": "Thiên Tài", "Tân": "Chính Quan", "Canh": "Thiên Quan", "Quý": "Chính Ấn", "Nhâm": "Thiên Ấn", "Giáp": "Tỷ Kiên", "Ất": "Kiếp Tài", "Bính": "Thực Thần", "Đinh": "Thương Quan" },
+        "Ất": { "Kỷ": "Chính Tài", "Mậu": "Thiên Tài", "Canh": "Chính Quan", "Tân": "Thiên Quan", "Nhâm": "Chính Ấn", "Quý": "Thiên Ấn", "Ất": "Tỷ Kiên", "Giáp": "Kiếp Tài", "Đinh": "Thực Thần", "Bính": "Thương Quan" },
+        "Bính": { "Tân": "Chính Tài", "Canh": "Thiên Tài", "Quý": "Chính Quan", "Nhâm": "Thiên Quan", "Giáp": "Chính Ấn", "Ất": "Thiên Ấn", "Bính": "Tỷ Kiên", "Đinh": "Kiếp Tài", "Mậu": "Thực Thần", "Kỷ": "Thương Quan" },
+        "Đinh": { "Canh": "Chính Tài", "Tân": "Thiên Tài", "Nhâm": "Chính Quan", "Quý": "Thiên Quan", "Ất": "Chính Ấn", "Giáp": "Thiên Ấn", "Đinh": "Tỷ Kiên", "Bính": "Kiếp Tài", "Kỷ": "Thực Thần", "Mậu": "Thương Quan" },
+        "Mậu": { "Quý": "Chính Tài", "Nhâm": "Thiên Tài", "Giáp": "Chính Quan", "Ất": "Thiên Quan", "Bính": "Chính Ấn", "Đinh": "Thiên Ấn", "Mậu": "Tỷ Kiên", "Kỷ": "Kiếp Tài", "Canh": "Thực Thần", "Tân": "Thương Quan" },
+        "Kỷ": { "Nhâm": "Chính Tài", "Quý": "Thiên Tài", "Ất": "Chính Quan", "Giáp": "Thiên Quan", "Đinh": "Chính Ấn", "Bính": "Thiên Ấn", "Kỷ": "Tỷ Kiên", "Mậu": "Kiếp Tài", "Tân": "Thực Thần", "Canh": "Thương Quan" },
+        "Canh": { "Giáp": "Chính Tài", "Ất": "Thiên Tài", "Đinh": "Chính Quan", "Bính": "Thiên Quan", "Kỷ": "Chính Ấn", "Mậu": "Thiên Ấn", "Canh": "Tỷ Kiên", "Tân": "Kiếp Tài", "Nhâm": "Thực Thần", "Quý": "Thương Quan" },
+        "Tân": { "Ất": "Chính Tài", "Giáp": "Thiên Tài", "Bính": "Chính Quan", "Đinh": "Thiên Quan", "Mậu": "Chính Ấn", "Kỷ": "Thiên Ấn", "Tân": "Tỷ Kiên", "Canh": "Kiếp Tài", "Quý": "Thực Thần", "Nhâm": "Thương Quan" },
+        "Nhâm": { "Bính": "Chính Tài", "Đinh": "Thiên Tài", "Mậu": "Chính Quan", "Kỷ": "Thiên Quan", "Tân": "Chính Ấn", "Canh": "Thiên Ấn", "Quý": "Tỷ Kiên", "Nhâm": "Kiếp Tài", "Giáp": "Thực Thần", "Ất": "Thương Quan" },
+        "Quý": { "Đinh": "Chính Tài", "Bính": "Thiên Tài", "Kỷ": "Chính Quan", "Mậu": "Thiên Quan", "Canh": "Chính Ấn", "Tân": "Thiên Ấn", "Nhâm": "Tỷ Kiên", "Quý": "Kiếp Tài", "Ất": "Thực Thần", "Giáp": "Thương Quan" }
+    };
+
+    // BẢNG 12 TRƯỜNG SINH
+    const truongSinhTable = {
+        "Giáp": { "Hợi": "Trường Sinh", "Tý": "Mộc Dục", "Sửu": "Quan Đới", "Dần": "Lâm Quan", "Mão": "Đế Vượng", "Thìn": "Suy", "Tỵ": "Bệnh", "Ngọ": "Tử", "Mùi": "Mộ", "Thân": "Tuyệt", "Dậu": "Thai", "Tuất": "Dưỡng" },
+        "Ất": { "Ngọ": "Trường Sinh", "Tỵ": "Mộc Dục", "Thìn": "Quan Đới", "Mão": "Lâm Quan", "Dần": "Đế Vượng", "Sửu": "Suy", "Tý": "Bệnh", "Hợi": "Tử", "Tuất": "Mộ", "Dậu": "Tuyệt", "Thân": "Thai", "Mùi": "Dưỡng" },
+        "Bính": { "Dần": "Trường Sinh", "Mão": "Mộc Dục", "Thìn": "Quan Đới", "Tỵ": "Lâm Quan", "Ngọ": "Đế Vượng", "Mùi": "Suy", "Thân": "Bệnh", "Dậu": "Tử", "Tuất": "Mộ", "Hợi": "Tuyệt", "Tý": "Thai", "Sửu": "Dưỡng" },
+        "Đinh": { "Dậu": "Trường Sinh", "Thân": "Mộc Dục", "Mùi": "Quan Đới", "Ngọ": "Lâm Quan", "Tỵ": "Đế Vượng", "Thìn": "Suy", "Mão": "Bệnh", "Dần": "Tử", "Sửu": "Mộ", "Tý": "Tuyệt", "Hợi": "Thai", "Tuất": "Dưỡng" },
+        "Mậu": { "Dần": "Trường Sinh", "Mão": "Mộc Dục", "Thìn": "Quan Đới", "Tỵ": "Lâm Quan", "Ngọ": "Đế Vượng", "Mùi": "Suy", "Thân": "Bệnh", "Dậu": "Tử", "Tuất": "Mộ", "Hợi": "Tuyệt", "Tý": "Thai", "Sửu": "Dưỡng" },
+        "Kỷ": { "Dậu": "Trường Sinh", "Thân": "Mộc Dục", "Mùi": "Quan Đới", "Ngọ": "Lâm Quan", "Tỵ": "Đế Vượng", "Thìn": "Suy", "Mão": "Bệnh", "Dần": "Tử", "Sửu": "Mộ", "Tý": "Tuyệt", "Hợi": "Thai", "Tuất": "Dưỡng" },
+        "Canh": { "Tỵ": "Trường Sinh", "Ngọ": "Mộc Dục", "Mùi": "Quan Đới", "Thân": "Lâm Quan", "Dậu": "Đế Vượng", "Tuất": "Suy", "Hợi": "Bệnh", "Tý": "Tử", "Sửu": "Mộ", "Dần": "Tuyệt", "Mão": "Thai", "Thìn": "Dưỡng" },
+        "Tân": { "Tý": "Trường Sinh", "Hợi": "Mộc Dục", "Tuất": "Quan Đới", "Dậu": "Lâm Quan", "Thân": "Đế Vượng", "Mùi": "Suy", "Ngọ": "Bệnh", "Tỵ": "Tử", "Thìn": "Mộ", "Mão": "Tuyệt", "Dần": "Thai", "Sửu": "Dưỡng" },
+        "Nhâm": { "Thân": "Trường Sinh", "Dậu": "Mộc Dục", "Tuất": "Quan Đới", "Hợi": "Lâm Quan", "Tý": "Đế Vượng", "Sửu": "Suy", "Dần": "Bệnh", "Mão": "Tử", "Thìn": "Mộ", "Tỵ": "Tuyệt", "Ngọ": "Thai", "Mùi": "Dưỡng" },
+        "Quý": { "Mão": "Trường Sinh", "Dần": "Mộc Dục", "Sửu": "Quan Đới", "Tý": "Lâm Quan", "Hợi": "Đế Vượng", "Tuất": "Suy", "Dậu": "Bệnh", "Thân": "Tử", "Mùi": "Mộ", "Ngọ": "Tuyệt", "Tỵ": "Thai", "Thìn": "Dưỡng" }
+    };
+
+    // Dữ liệu Cân Lượng
+    const canLuongNam = { /* ... (Dữ liệu gốc) ... */ 
+        "Giáp Tý": 1.2, "Bính Tý": 1.6, "Mậu Tý": 1.5, "Canh Tý": 0.7, "Nhâm Tý": 0.5, "Ất Sửu": 0.9, "Đinh Sửu": 0.8, "Kỷ Sửu": 0.8, "Tân Sửu": 0.7, "Quý Sửu": 0.5, "Bính Dần": 0.6, "Mậu Dần": 0.8, "Canh Dần": 0.9, "Nhâm Dần": 0.9, "Giáp Dần": 1.2, "Đinh Mão": 0.7, "Kỷ Mão": 1.9, "Tân Mão": 1.2, "Quý Mão": 1.2, "Ất Mão": 0.8, "Mậu Thìn": 1.2, "Canh Thìn": 1.2, "Nhâm Thìn": 1, "Giáp Thìn": 0.8, "Bính Thìn": 0.8, "Kỷ Tỵ": 0.5, "Tân Tỵ": 0.6, "Quý Tỵ": 0.7, "Ất Tỵ": 0.7, "Đinh Tỵ": 0.6, "Canh Ngọ": 0.9, "Nhâm Ngọ": 0.8, "Giáp Ngọ": 1.5, "Bính Ngọ": 1.3, "Mậu Ngọ": 1.9, "Tân Mùi": 0.8, "Quý Mùi": 0.7, "Ất Mùi": 0.6, "Đinh Mùi": 0.5, "Kỷ Mùi": 0.6, "Nhâm Thân": 0.7, "Giáp Thân": 0.5, "Bính Thân": 0.5, "Mậu Thân": 1.4, "Canh Thân": 0.8, "Quý Dậu": 0.8, "Ất Dậu": 1.5, "Đinh Dậu": 1.4, "Kỷ Dậu": 0.5, "Tân Dậu": 1.6, "Giáp Tuất": 0.5, "Bính Tuất": 0.6, "Mậu Tuất": 1.4, "Canh Tuất": 0.9, "Nhâm Tuất": 1, "Ất Hợi": 0.9, "Đinh Hợi": 1.6, "Kỷ Hợi": 0.9, "Tân Hợi": 1.7, "Quý Hợi": 0.7
+    };
+    const canLuongThang = {
+        "1": 0.6, "2": 0.7, "3": 1.8, "4": 0.9, "5": 0.5, "6": 1.6,
+        "7": 0.9, "8": 1.5, "9": 1.8, "10": 1.8, "11": 0.9, "12": 0.5
+    };
+    const canLuongNgay = {
+        1: 0.5, 2: 1, 3: 0.8, 4: 1.5, 5: 1.5, 6: 1.5, 7: 0.8, 8: 1.6, 9: 0.8, 10: 1.6,
+        11: 0.9, 12: 1.7, 13: 0.8, 14: 1.7, 15: 1.0, 16: 0.8, 17: 0.9, 18: 1.8, 19: 0.5, 20: 1.5,
+        21: 1.0, 22: 0.9, 23: 0.8, 24: 0.9, 25: 1.5, 26: 1.8, 27: 0.7, 28: 0.8, 29: 1.6, 30: 0.6, 31: 0.5
+    };
+    const canLuongGio = {
+        "Tý": 1.6, "Sửu": 0.6, "Dần": 0.7, "Mão": 1.0, "Thìn": 0.9, "Tỵ": 1.6,
+        "Ngọ": 1.0, "Mùi": 0.8, "Thân": 0.8, "Dậu": 0.9, "Tuất": 0.6, "Hợi": 0.6
+    };
+
+    // =========================================================================
+    // II. CÁC HÀM THIÊN VĂN / LỊCH ÂM (CORE UTILITIES) - GIỮ NGUYÊN
+    // =========================================================================
+
+    // Hàm Tính Tứ Trụ (computeBatTuWithOffset)
+    function norm360(a) { a = a % 360; if (a < 0) a += 360; return a; }
+    function angleDiff(a, b) { var d = norm360(a - b); if (d > 180) d -= 360; return d; }
+    function jdnFromDate(y, m, d) { var a = Math.floor((14 - m) / 12); var y2 = y + 4800 - a; var m2 = m + 12 * a - 3; return d + Math.floor((153 * m2 + 2) / 5) + 365 * y2 + Math.floor(y2 / 4) - Math.floor(y2 / 100) + Math.floor(y2 / 400) - 32045; }
+    function sunLongitude(JD) { var T = (JD - 2451545.0) / 36525.0; var L0 = 280.46646 + 36000.76983 * T + 0.0003032 * T * T; var M = 357.52911 + 35999.05029 * T - 0.0001537 * T * T; L0 = norm360(L0); M = norm360(M); var Mr = M * Math.PI / 180.0; var C = (1.914602 - 0.004817 * T - 0.000014 * T * T) * Math.sin(Mr) + (0.019993 - 0.000101 * T) * Math.sin(2 * Mr) + 0.000289 * Math.sin(3 * Mr); return norm360(L0 + C); }
+    function findSolarTermJDApproximately(year, targetDegree, tzOffsetHours) { var approxJD = jdnFromDate(year, 2, 4) + (12 - tzOffsetHours) / 24.0; var lo = approxJD - 3.0, hi = approxJD + 3.0; var flo = angleDiff(sunLongitude(lo), targetDegree); var fhi = angleDiff(sunLongitude(hi), targetDegree); var expand = 0; while (flo * fhi > 0 && expand < 10) { lo -= 3; hi += 3; flo = angleDiff(sunLongitude(lo), targetDegree); fhi = angleDiff(sunLongitude(hi), targetDegree); expand++; } if (flo * fhi > 0) return approxJD; for (var i = 0; i < 80; i++) { var mid = (lo + hi) / 2.0; var fmid = angleDiff(sunLongitude(mid), targetDegree); if (Math.abs(fmid) < 1e-9) return mid; if (flo * fmid <= 0) { hi = mid; fhi = fmid; } else { lo = mid; flo = fmid; } } return (lo + hi) / 2.0; }
+    function computeBatTuWithOffset(year, month, day, hourInput, tzOffsetHours) {
+        year = Number(year); month = Number(month); day = Number(day);
+        var hour = (!isNaN(hourInput) && hourInput !== "") ? Number(hourInput) : 0;
+        var JDN = jdnFromDate(year, month, day);
+        var dayCanIndex = ((JDN + 9) % 10 + 10) % 10, dayChiIndex = ((JDN + 1) % 12 + 12) % 12;
+        var canNgay = CAN[dayCanIndex], chiNgay = CHI[dayChiIndex];
+        var jdLichun = findSolarTermJDApproximately(year, 315.0, tzOffsetHours);
+        var JD_local_noon = JDN + (12 - tzOffsetHours) / 24.0;
+        var yearUsed = (JD_local_noon >= jdLichun) ? year : (year - 1);
+        var canNamIndex = ((yearUsed + 6) % 10 + 10) % 10, chiNamIndex = ((yearUsed + 8) % 12 + 12) % 12;
+        var canNam = CAN[canNamIndex], chiNam = CHI[chiNamIndex];
+        var lam = sunLongitude(JD_local_noon);
+        var monthNumber = Math.floor(((lam - 315 + 360) % 360) / 30) + 1;
+        var canThangIndex = ((canNamIndex * 2 + monthNumber + 1) % 10 + 10) % 10;
+        var chiThangIndex = ((monthNumber + 1) % 12 + 12) % 12;
+        var canThang = CAN[canThangIndex], chiThang = CHI[chiThangIndex];
+        var chiGioIndex = Math.floor((hour + 1) / 2) % 12;
+        var canGioIndex = ((dayCanIndex * 2 + chiGioIndex) % 10 + 10) % 10;
+        var canGio = CAN[canGioIndex], chiGio = CHI[chiGioIndex];
+        return { pillars: [canNam + " " + chiNam, canThang + " " + chiThang, canNgay + " " + chiNgay, canGio + " " + chiGio] };
+    }
+
+    // Các Hàm Lịch Âm (convertSolar2Lunar)
+    function jdFromDate(dd, mm, yy) {
+        const a = Math.floor((14 - mm) / 12); const y = yy + 4800 - a; const m = mm + 12 * a - 3;
+        let jd = dd + Math.floor((153 * m + 2) / 5) + 365 * y + Math.floor(y / 4);
+        jd = jd - Math.floor(y / 100) + Math.floor(y / 400) - 32045;
+        if (jd < 2299161) jd = dd + Math.floor((153 * m + 2) / 5) + 365 * y + Math.floor(y / 4) - 32083;
+        return jd;
+    }
+    function getNewMoonDay(k, timeZone) {
+        const T = k / 1236.85; const T2 = T * T; const T3 = T2 * T; const dr = Math.PI / 180;
+        let Jd1 = 2415020.75933 + 29.53058868 * k + 0.0001178 * T2 - 0.000000155 * T3;
+        Jd1 += 0.00033 * Math.sin((166.56 + 132.87 * T - 0.009173 * T2) * dr);
+        const M = 359.2242 + 29.10535608 * k - 0.0000333 * T2 - 0.00000347 * T3;
+        const Mpr = 306.0253 + 385.81691806 * k + 0.0107306 * T2 + 0.00001236 * T3;
+        const F = 21.2964 + 390.67050646 * k - 0.0016528 * T2 - 0.00000239 * T3;
+        let C1 = (0.1734 - 0.000393 * T) * Math.sin(M * dr) + 0.0021 * Math.sin(2 * dr * M) - 0.4068 * Math.sin(Mpr * dr) + 0.0161 * Math.sin(dr * 2 * Mpr) - 0.0004 * Math.sin(dr * 3 * Mpr) + 0.0104 * Math.sin(dr * 2 * F) - 0.0051 * Math.sin(dr * (M + Mpr)) - 0.0074 * Math.sin(dr * (M - Mpr)) + 0.0004 * Math.sin(dr * (2 * F + M)) - 0.0004 * Math.sin(dr * (2 * F - M)) - 0.0006 * Math.sin(dr * (2 * F + Mpr)) + 0.0010 * Math.sin(dr * (2 * F - Mpr)) + 0.0005 * Math.sin(dr * (M + 2 * Mpr));
+        let deltat;
+        if (T < -11) deltat = 0.001 + 0.000839 * T + 0.0002261 * T2 - 0.00000845 * T3 - 0.000000081 * T * T3;
+        else deltat = -0.000278 + 0.000265 * T + 0.000262 * T2;
+        const JdNew = Jd1 + C1 - deltat;
+        return Math.floor(JdNew + 0.5 + timeZone / 24);
+    }
+    function getSunLongitude(jdn, timeZone) {
+        const T = (jdn - 2451545.5 - timeZone / 24) / 36525; const T2 = T * T; const dr = Math.PI / 180;
+        const M = 357.52910 + 35999.05030 * T - 0.0001559 * T2 - 0.00000048 * T * T2;
+        const L0 = 280.46645 + 36000.76983 * T + 0.0003032 * T2;
+        let DL = (1.914600 - 0.004817 * T - 0.000014 * T2) * Math.sin(dr * M);
+        DL = DL + (0.019993 - 0.000101 * T) * Math.sin(dr * 2 * M) + 0.000290 * Math.sin(dr * 3 * M);
+        const L = L0 + DL;
+        let omega = 125.04 - 1934.136 * T;
+        const lambda = L - 0.00569 - 0.00478 * Math.sin(omega * dr);
+        return Math.floor(((lambda / 30) % 12));
+    }
+    function getLunarMonth11(yy, timeZone) {
+        const off = jdFromDate(31, 12, yy) - 2415021; const k = Math.floor(off / 29.530588853);
+        let nm = getNewMoonDay(k, timeZone);
+        const sunLong = getSunLongitude(nm, timeZone);
+        if (sunLong >= 9) nm = getNewMoonDay(k - 1, timeZone);
+        return nm;
+    }
+    function getLeapMonthOffset(a11, timeZone) {
+        const k = Math.floor((a11 - 2415021.076998695) / 29.530588853 + 0.5);
+        let last = 0; let i = 1;
+        let arc = getSunLongitude(getNewMoonDay(k + i, timeZone), timeZone);
+        do { last = arc; i++; arc = getSunLongitude(getNewMoonDay(k + i, timeZone), timeZone); } while (arc != last && i < 14);
+        return i - 1;
+    }
+    function convertSolar2Lunar(dd, mm, yy, timeZone) {
+        const dayNumber = jdFromDate(dd, mm, yy);
+        const k = Math.floor((dayNumber - 2415021.076998695) / 29.530588853);
+        let monthStart = getNewMoonDay(k + 1, timeZone);
+        if (monthStart > dayNumber) monthStart = getNewMoonDay(k, timeZone);
+        let a11 = getLunarMonth11(yy, timeZone); let b11 = a11;
+        if (a11 >= monthStart) a11 = getLunarMonth11(yy - 1, timeZone);
+        else b11 = getLunarMonth11(yy + 1, timeZone);
+        const lunarDay = dayNumber - monthStart + 1;
+        const diff = Math.floor((monthStart - a11) / 29);
+        let lunarMonth = diff + 11;
+        let lunarYear = yy;
+        if (b11 - a11 > 365) {
+            const leapMonthDiff = getLeapMonthOffset(a11, timeZone);
+            if (diff >= leapMonthDiff) lunarMonth = diff + 10;
+        }
+        if (lunarMonth > 12) lunarMonth -= 12;
+        if (lunarMonth >= 11 && diff < 4) lunarYear -= 1;
+        return [lunarDay, lunarMonth, lunarYear];
+    }
+
+    // =========================================================================
+    // III. CÁC HÀM TÍNH TOÁN THUỘC TÍNH (THẬP THẦN, CHÒM SAO, CÂN LƯỢNG)
+    // =========================================================================
+
+    /**
+     * Hàm tính Chòm Sao (Zodiac)
+     * Đã khắc phục lỗi logic bằng cách so sánh chuỗi ngày tháng (MM-DD)
+     */
+    function getZodiacSign(month, day) {
+        // Tạo chuỗi ngày tháng MM-DD để so sánh
+        const dateString = `${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+
+        for (const zodiac of zodiacs) {
+            const startDate = zodiac.start;
+            const endDate = zodiac.end;
+
+            // Trường hợp cung chuyển giao năm (ví dụ: Ma Kết 12-22 đến 01-19)
+            if (startDate > endDate) {
+                // Kiểm tra: ngày sinh >= ngày bắt đầu (trong năm hiện tại) HOẶC ngày sinh <= ngày kết thúc (trong năm sau)
+                if (dateString >= startDate || dateString <= endDate) {
+                    return zodiac;
+                }
+            }
+            // Trường hợp cung trong cùng một năm
+            else {
+                if (dateString >= startDate && dateString <= endDate) {
+                    return zodiac;
+                }
+            }
+        }
+        return { name: "Không xác định", range: "" };
+    }
+
+// THÊM HÀM TRA CỨU NHANH TRONG PHẦN III (CÁC HÀM TÍNH TOÁN THUỘC TÍNH)
+function getZodiacCompatibility(zodiacName) {
+    return zodiacs.find(z => z.name === zodiacName);
+}
+
+
+
+    /**
+     * Tính Thập Thần
+     */
+    function getThapThan(nhatCan, doiCan) {
+        if (!nhatCan || !doiCan) return "";
+        return bangThapThan[nhatCan]?.[doiCan] || "";
+    }
+
+    /**
+     * Tính 12 Trường Sinh
+     */
+    function tinhTrangSinh(nhatCan, chiXet) {
+        if (!nhatCan || !chiXet) return "";
+        return truongSinhTable[nhatCan]?.[chiXet] || "";
+    }
+
+    /**
+     * Hiển thị vị trí Trường Sinh (ví dụ: Địa Chi Dần là vị trí Trường Sinh của Bính/Mậu)
+     */
+    function hienThiViTriTruongSinh(nhatCan) {
+        const col = truongSinhTable[nhatCan];
+        if (!col) return;
+        const chi = Object.keys(col);
+        // Lấy vị trí thứ 5 (Đế Vượng) và vị trí thứ 10 (Tuyệt)
+        document.getElementById("viTri5").textContent = chi[4] || "";
+        document.getElementById("viTri10").textContent = chi[9] || "";
+    }
+
+   /////////////////////////////////////////////////////////////////////////////////////////////////
+    const luongChiText = {
+  "7.1": "Sinh ra với số mệnh phi thường, được ban cho nhiều khanh tướng công hầu, sống trong sự tiêu diêu khoái lạc của phúc báo, cực phẩm hưng long vô song.",
+  "7.0": "Phúc lớn như biển, không phải lo lắng gì cả, y lộc do trời ban cho không thể thay đổi, một đời vinh quang phú quý không ai sánh bằng.",
+
+  "6.9": "Một ngôi sao may mắn trên trần gian, một thân giàu sang phú quý, mọi người đều tôn trọng. Nói chung là phước lộc do trời ban tặng, sống trong hạnh phúc vinh hiển suốt cuộc đời.",
+  "6.8": "Phú quý do trời phú cho, không cần vất vả, gia sản có đầy ắp; nhưng sau mười năm lại không còn như xưa kia, phước lộc tổ tiên tan biến như chiếc thuyền giữa biển cả giông tố.",
+  "6.7": "Sinh ra đã được trời ban phước báo, ruộng đất gia sản thật thịnh vượng, suốt đời giàu sang vinh diệu, mọi sự an lành viên mãn.",
+  "6.6": "Phú quý do trời sắp đặt sẵn rồi, phước lộc vượt qua mọi người, quan vị cao sang uy quyền, châu báu ngập tràn khắp nơi, sung sướng cùng vợ con.",
+  "6.5": "Nhìn ra thì phước lộc không hề ít ỏi, tài năng giúp ích cho nước nhà, công lao an bình cho dân chúng; chức tước cao quý trong triều đình, giàu sang không thiếu thứ gì cả, danh tiếng lan tỏa khắp thiên hạ.",
+  "6.4": "Giàu sang vinh diệu không ai sánh được; uy quyền quyền lực không ai bằng phẳng. Mặc áo tím đeo đai vàng, ngồi ngôi cao nhất trong triều, suốt đời sung sướng vui vẻ.",
+  "6.3": "Thi đỗ cao cấp, làm quan trọng, giàu sang vô cùng, được khen ngợi khắp nơi; phước lộc vô biên, gia đình hưng thịnh.",
+  "6.2": "Phước lộc không tận, học hành thành tài, làm cho cha mẹ tự hào, mặc áo gấm đeo đai vàng, giàu sang vinh diệu, mọi sự sung túc.",
+  "6.1": "Trí tuệ sáng suốt, học tập nhiều mặt, tự thân vinh quang, tên thi vào bảng danh dự. Dù không làm quan cao cấp, cũng chắc chắn là một nhà giàu có.",
+  "6.0": "Tên thi vào bảng cao nhất, gây dựng công danh to lớn, mang lại vinh hiển cho gia tộc, ruộng đất gia sản thịnh vượng, sức khỏe dồi dào.",
+
+  "5.9": "Người có số này là người tài hoa xuất chúng, thân thể mềm mại nhưng linh hồn thanh khiết. Họ có phận trời ban, học vấn cao siêu, đậu đạt các kỳ thi danh giá, được phong quan tước chức cao sang.",
+  "5.8": "Người giàu sang phú quý, quyền thế uy nghi, được trời ưu ái ban cho phước lộc suốt đời. Họ có cuộc sống an nhàn sung túc, danh vọng kiêu ngạo, tài lộc dồi dào, phú thọ viên mãn.",
+  "5.7": "Hưởng phước trọn vẹn, mọi việc đều thuận lợi, quang vinh tổ tiên, oai hùng tự tại. Họ được mọi người kính nể yêu mến, riêng mình thưởng thức bầu trời xanh.",
+  "5.6": "Hiếu đạo thông minh, cuộc đời an khang phước đức; trải qua nhiều thăng trầm, nguồn tài lợi thì vô biên, bình an và hậu duệ.",
+  "5.5": "Lúc trẻ luôn bôn ba khổ sở trên con đường danh vọng, nhưng công lao không bằng sự may mắn. Đến một ngày kia, phước lộc sẽ ùa về như nước triều dâng, rồi tự nhiên giàu có vinh quang.",
+  "5.4": "Tính cách chính trực và cao thượng, học tập chăm chỉ, ăn mặc thanh lịch, tự nhiên an bình, chính là người có phúc khí trên đời.",
+  "5.3": "Xem ra tính tình chân thành, công việc gia đình mà thành công cũng nhờ vào đó. Phước lộc suốt đời có số mệnh sắp đặt sẵn hoa lệ phú quý.",
+  "5.2": "Cuộc đời hạnh phúc, việc gì cũng tốt lành, chẳng cần vất vả mà tự nhiên yên vui. Họ hàng thân thuộc thảy đều ủng hộ; sự nghiệp thăng tiến.",
+  "5.1": "Cuộc đời rực rỡ, mọi việc thảy đều thuận buồm xuôi gió, chẳng cần gắng sức mà tự nhiên hạnh phúc. Anh em bạn bè đều hòa thuận như ý, gia sản và phước lộc đặng trọn vẹn.",
+  "5.0": "Ngày ngày chỉ lao tâm khổ tứ về mặt công danh tài lợi. Lúc nửa đời cũng có nhiều lần gặp phước lộc; đến già có vì sao Tài Tinh chiếu sáng sẽ đặng sống nhàn hạ.",
+
+  "4.9": "Phúc lộc vô biên, do chính tay mình gầy dựng nên sự nghiệp vinh quang cho gia đình. Người giàu sang đều kính nể. Cuộc đời sung túc hạnh phúc.",
+  "4.8": "Khó khăn cả đời, từ khi còn trẻ cho đến khi già, chẳng có gì thịnh vượng. Anh em họ hàng không giúp đỡ được gì. Chỉ khi về già mới có chút an ổn.",
+  "4.7": "Giàu sang khi tuổi xế chiều, vợ con phú quý, nhờ có phước báu tích lũy như nước chảy về.",
+  "4.6": "May mắn mọi nơi, nhất là khi thay đổi họ hoặc dời nhà thì càng thêm thịnh vượng. Ăn mặc no đủ do số trời ban. Từ nửa đời trở đi cho đến khi già đều ổn định bình an.",
+  "4.5": "Gian nan về công danh lợi lộc, trước phải chịu nhiều khổ cực, sau này cũng lang thang; số ít con cái vì khó nuôi dưỡng; anh em ruột thịt cũng không giúp ích được nhiều.",
+  "4.4": "Do trời ban phước lộc, không cần lo lắng gì nhiều. Phúc lộc sau này sẽ hơn nhiều so với trước. Dù rằng khi trẻ khó có được tài lộc và sự sung sướng, nhưng khi già sẽ được yên bình.",
+  "4.3": "Thông minh tài giỏi, tự tin trước người sang quý, phúc lộc do trời ban, không cần vất vả nhưng mọi việc đều suôn sẻ.",
+  "4.2": "Được nhiều điều mong muốn. Từ nửa đời trở đi thì vận mệnh sẽ tốt hơn, lúc đó tài lộc công danh sẽ phát triển mạnh mẽ.",
+  "4.1": "Tài ba nhưng không ổn định, công việc không có gì giống nhau; từ nửa đời bắt đầu suy thoái phước tiêu diêu, không còn như xưa kia chưa thành công.",
+  "4.0": "Phúc lộc bền vững, nhưng trước trải qua nhiều sóng gió khó khăn. Sau này sẽ được hưởng thụ cuộc sống an nhàn giàu có.",
+
+  "3.9": "Đường đời gian nan trắc trở, dù có cố gắng vẫn không thành công. Bao nhiêu công sức và tâm huyết xây dựng nên sự nghiệp nhưng cuối cùng lại tan thành mây khói.",
+  "3.8": "Tính tình cao thượng, từ 36 tuổi trở đi sẽ gặp nhiều may mắn. Sẽ giàu sang phú quý, được người ngưỡng mộ và kính trọng.",
+  "3.7": "Không có duyên với việc làm, anh em thân thuộc không giúp đỡ. Chỉ sống nhờ vào gia sản của tổ tiên, nhưng cũng không bền lâu. Khi đi xa thì không biết khi nào mới trở về.",
+  "3.6": "Cả đời không cần vất vả quá nhiều, chỉ cần một tay làm chủ được cơ đồ. Có phúc khí to lớn, dù có gặp khó khăn cũng sẽ vượt qua được. Sẽ có tài lộc dồi dào và hạnh phúc.",
+  "3.5": "Phúc đức trong đời không hoàn thiện, không được hưởng trọn vẹn phúc lộc do tổ tiên để lại. Phải chờ đợi thời cơ mới no đủ hơn xưa.",
+  "3.4": "Có phúc khí tu tập, xa quê và cha mẹ tìm đến chỗ Phật, hàng ngày niệm Phật mới mong được an lành và viên mãn.",
+  "3.3": "Đầu đời việc làm khó thành công, mưu tính cũng không hiệu quả. Từ nửa đời trở đi mới có vận may tốt hơn, sẽ có tài lộc phát triển nhiều hơn.",
+  "3.2": "Năm xưa gặp nhiều rủi ro, khó khăn trong việc làm. Sau này tài lợi sẽ chảy về như nước. Nửa sau cuộc đời sẽ sung túc, công danh lợi lộc thuận buồm xuôi gió.",
+  "3.1": "Sinh kế gian khổ vất vả, khó có thể dựa vào gia sản của tổ tiên để xây dựng nhà cửa. Nửa sau cuộc đời mới có đủ ăn đủ mặc.",
+  "3.0": "Lao lực suốt đời, khổ sở, chăm chỉ kiếm tiền nhưng đến già cũng chỉ giảm bớt chút ít phiền muộn mà thôi.",
+
+  "2.9": "Ngày xưa vất vả với cuộc đời, chưa có duyên nợ để thành công sớm, công danh chậm chạp, phải đến 40 tuổi mới được yên bình, thay đổi nơi ở hoặc họ tên mới có may mắn.",
+  "2.8": "Làm ăn bừa bãi không có tổ chức, sản nghiệp của tổ tiên như một giấc mơ xa vời. Nếu không nhận làm con nuôi hoặc không đổi họ tên thì chắc chắn di cư đi nhiều lần trong đời.",
+  "2.7": "Tự mình lo toan suốt đời, khó gặp được người giúp đỡ, không thể dựa vào phúc đức của tổ tiên để vững vàng. Quanh năm tự lực cánh sinh, từ nhỏ đến già cũng không có gì đáng nhớ.",
+  "2.6": "Số phận khốn khổ, một mình vật lộn với cuộc sống. Rời xa quê hương đất nước mới kiếm được miếng ăn, có lẽ chỉ khi già mới được sống an nhàn một chút.",
+  "2.5": "Do tổ nghiệp suy yếu, khó xây dựng được gia đình hạnh phúc, họ hàng thân thích gặp nhiều phiền toái, cả đời khổ cực, chỉ biết tự lo cho bản thân.",
+  "2.4": "Không có phúc lộc trong gia đình, khó mà thành công trong sự nghiệp, không có sự giúp đỡ của họ hàng thân thuộc, lang thang khắp nơi để kiếm sống tới khi tuổi già.",
+  "2.3": "Dù có cố gắng làm việc gì cũng khó mà thành công, không có sự ủng hộ của anh em họ hàng, cuối cùng chỉ biết chịu số phận đi xa quê hương để tìm kiếm miếng cơm manh áo.",
+  "2.2": "Do thân hàn cốt lạnh, khổ não tận tâm can, quanh năm lo toan kiếm ăn trong nghèo khó, nếu không cẩn thận trở thành kẻ lang bạt do số mệnh quyết định."
+};
+
+    
+    function tinhCanLuong(out, lunar, gioChi) {
+        // Trụ Năm
+        const resNam = out.pillars[0].trim();
+        const valueNam = canLuongNam[resNam] || 0;
+
+        // Trụ Tháng (dùng tháng Âm Lịch)
+        const thangSo = `${lunar[1]}`;
+        const valueThang = canLuongThang[thangSo] || 0;
+
+        // Trụ Ngày (dùng ngày Âm Lịch)
+        const ngaySo = `${lunar[0]}`;
+        const valueNgay = canLuongNgay[ngaySo] || 0;
+
+        // Trụ Giờ (dùng Chi Giờ)
+        const valueGio = canLuongGio[gioChi] || 0;
+
+        const tongCanLuong = valueNam + valueThang + valueNgay + valueGio;
+
+        document.getElementById("ketQuaInput").textContent = tongCanLuong.toFixed(1);
+        // 🔥 Lấy mô tả tương ứng
+    const moTa = luongChiText[tongCanLuong.toFixed(1)] || "Không có mô tả cho số lượng chỉ này.";
+
+    // Hiển thị mô tả
+    document.getElementById("moTaLuongChi").textContent = moTa;
+    }
+
+    // =========================================================================
+    // IV. HÀM CHÍNH XỬ LÝ (MAIN FUNCTION)
+    // =========================================================================
+
+    function tinhTuTru() {
+        const y = document.getElementById('year').value;
+        const m = document.getElementById('month').value;
+        const d = document.getElementById('day').value;
+        const gioChi = document.getElementById('gio').value;
+
+        // 1. Kiểm tra đầu vào
+        if (!y || !m || !d || !gioChi) {
+            alert("Vui lòng nhập đầy đủ Năm, Tháng, Ngày và Giờ sinh.");
+            return;
+        }
+
+        // 2. Tính Tứ Trụ và Âm Lịch
+        const hour = CHI_TO_HOUR[gioChi];
+        const out = computeBatTuWithOffset(y, m, d, hour, 7);
+        const lunar = convertSolar2Lunar(Number(d), Number(m), Number(y), 7);
+        const nhatCan = out.pillars[2].split(" ")[0]; // Nhật Can dùng để quy chiếu
+
+        // 3. Hiển thị Tứ Trụ và Âm Lịch
+        out.pillars.forEach((p, i) => document.getElementById(`res-${ids[i]}`).textContent = p);
+        document.getElementById("am-nam").textContent = `${lunar[2]}`;
+        document.getElementById("am-thang").textContent = `${lunar[1]}`;
+        document.getElementById("am-ngay").textContent = `${lunar[0]}`;
+        document.getElementById("am-gio").textContent = gioChi;
+        
+        /////////////////////////////////////////////////////////////////
+       
+       // Bảng Thiên Khắc & Địa Xung
+const canKhacMap = {Giáp:'Mậu',Ất:'Kỷ',Bính:'Nhâm',Đinh:'Quý',Mậu:'Nhâm',Kỷ:'Quý',Canh:'Giáp',Tân:'Ất',Nhâm:'Bính',Quý:'Đinh'};
+const chiXungMap = {Tý:'Hợi',Sửu:'Mùi',Dần:'Thân',Mão:'Dậu',Thìn:'Tuất',Tỵ:'Hợi',Ngọ:'Tý',Mùi:'Sửu',Thân:'Dần',Dậu:'Mão',Tuất:'Thìn',Hợi:'Tỵ'};
+
+// Lấy Can/Chi từ res-*
+function getCanChi(id) {
+    const val = document.getElementById(id).textContent.trim();
+    return val.includes(' ') ? val.split(' ') : ['-', '-'];
+}
+
+const [canNam, chiNam] = getCanChi('res-nam');
+const [canThang, chiThang] = getCanChi('res-thang');
+const [canNgay, chiNgay] = getCanChi('res-ngay');
+const [canGio, chiGio] = getCanChi('res-gio');
+
+
+// Điền tóm tắt vào bảng
+document.getElementById("tkdx-nam").textContent = `${canKhacMap[canNam] || '-'}  ${chiXungMap[chiNam] || '-'}`;
+document.getElementById("tkdx-thang").textContent = `${canKhacMap[canThang] || '-'}  ${chiXungMap[chiThang] || '-'}`;
+document.getElementById("tkdx-ngay").textContent = `${canKhacMap[canNgay] || '-'}  ${chiXungMap[chiNgay] || '-'}`;
+document.getElementById("tkdx-gio").textContent = `${canKhacMap[canGio] || '-'}  ${chiXungMap[chiGio] || '-'}`;
+
+// Bảng Thiên hợp địa hợp
+const thienHopMap = {Giáp:'Kỷ',Kỷ:'Giáp',Ất:'Canh',Canh:'Ất',Bính:'Tân',Tân:'Bính',Đinh:'Nhâm',Nhâm:'Đinh',Mậu:'Quý',Quý:'Mậu'};
+const diaHopMap = {Tý:'Sửu',Sửu:'Tý',Dần:'Hợi',Hợi:'Dần',Mão:'Tuất',Tuất:'Mão',Thìn:'Dậu',Dậu:'Thìn',Tỵ:'Thân',Thân:'Tỵ',Ngọ:'Mùi',Mùi:'Ngọ'};
+
+
+// Điền tóm tắt vào bảng
+document.getElementById("thdh-nam").textContent = `${thienHopMap[canNam] || '-'}  ${diaHopMap[chiNam] || '-'}`;
+document.getElementById("thdh-thang").textContent = `${thienHopMap[canThang] || '-'}  ${diaHopMap[chiThang] || '-'}`;
+document.getElementById("thdh-ngay").textContent = `${thienHopMap[canNgay] || '-'}  ${diaHopMap[chiNgay] || '-'}`;
+document.getElementById("thdh-gio").textContent = `${thienHopMap[canGio] || '-'}  ${diaHopMap[chiGio] || '-'}`;
+document.getElementById("thdh-namm").textContent = `${thienHopMap[canNam] || '-'}  ${diaHopMap[chiNam] || '-'}`;
+
+function getCanChi(id) {
+    const [can, chi] = document.getElementById(id).textContent.trim().split(" ");
+    return [can, chi];
+}
+
+const canList = ["Giáp","Ất","Bính","Đinh","Mậu","Kỷ","Canh","Tân","Nhâm","Quý"];
+const chiList = ["Tý","Sửu","Dần","Mão","Thìn","Tỵ","Ngọ","Mùi","Thân","Dậu","Tuất","Hợi"];
+
+function tinhFromRes(id) {
+    const [can, chi] = getCanChi(id);
+    const canMoi = canList[(canList.indexOf(can) + 1) % 10];
+    const chiMoi = chiList[(chiList.indexOf(chi) + 3) % 12];
+    return canMoi + " " + chiMoi;
+}
+
+// Ví dụ tính Thái Nguyên từ trụ năm
+document.getElementById("ketqua").innerHTML =
+    "<b>" + tinhFromRes("res-thang") + "</b>";
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+const lucThapHoaGiapNapAm = [
+  { hoaGiap: "Giáp Tý", napAm: "Hải Trung Kim" },
+  { hoaGiap: "Ất Sửu", napAm: "Hải Trung Kim" },
+  { hoaGiap: "Bính Dần", napAm: "Lư Trung Hỏa" },
+  { hoaGiap: "Đinh Mão", napAm: "Lư Trung Hỏa" },
+  { hoaGiap: "Mậu Thìn", napAm: "Đại Lâm Mộc" },
+  { hoaGiap: "Kỷ Tỵ", napAm: "Đại Lâm Mộc" },
+  { hoaGiap: "Canh Ngọ", napAm: "Lộ Bàng Thổ" },
+  { hoaGiap: "Tân Mùi", napAm: "Lộ Bàng Thổ" },
+  { hoaGiap: "Nhâm Thân", napAm: "Kiếm Phong Kim" },
+  { hoaGiap: "Quý Dậu", napAm: "Kiếm Phong Kim" },
+  { hoaGiap: "Giáp Tuất", napAm: "Sơn Đầu Hỏa" },
+  { hoaGiap: "Ất Hợi", napAm: "Sơn Đầu Hỏa" },
+  { hoaGiap: "Bính Tý", napAm: "Giảm Hạ Thủy" },
+  { hoaGiap: "Đinh Sửu", napAm: "Giảm Hạ Thủy" },
+  { hoaGiap: "Mậu Dần", napAm: "Thành Đầu Thổ" },
+  { hoaGiap: "Kỷ Mão", napAm: "Thành Đầu Thổ" },
+  { hoaGiap: "Canh Thìn", napAm: "Bạch Lạp Kim" },
+  { hoaGiap: "Tân Tỵ", napAm: "Bạch Lạp Kim" },
+  { hoaGiap: "Nhâm Ngọ", napAm: "Dương Liễu Mộc" },
+  { hoaGiap: "Quý Mùi", napAm: "Dương Liễu Mộc" },
+  { hoaGiap: "Giáp Thân", napAm: "Tuyền Trung Thủy" },
+  { hoaGiap: "Ất Dậu", napAm: "Tuyền Trung Thủy" },
+  { hoaGiap: "Bính Tuất", napAm: "Ốc Thượng Thổ" },
+  { hoaGiap: "Đinh Hợi", napAm: "Ốc Thượng Thổ" },
+  { hoaGiap: "Mậu Tý", napAm: "Thích Lịch Hỏa" },
+  { hoaGiap: "Kỷ Sửu", napAm: "Thích Lịch Hỏa" },
+  { hoaGiap: "Canh Dần", napAm: "Tùng Bách Mộc" },
+  { hoaGiap: "Tân Mão", napAm: "Tùng Bách Mộc" },
+  { hoaGiap: "Nhâm Thìn", napAm: "Trường Lưu Thủy" },
+  { hoaGiap: "Quý Tỵ", napAm: "Trường Lưu Thủy" },
+  { hoaGiap: "Giáp Ngọ", napAm: "Sa Trung Kim" },
+  { hoaGiap: "Ất Mùi", napAm: "Sa Trung Kim" },
+  { hoaGiap: "Bính Thân", napAm: "Sơn Hạ Hỏa" },
+  { hoaGiap: "Đinh Dậu", napAm: "Sơn Hạ Hỏa" },
+  { hoaGiap: "Mậu Tuất", napAm: "Bình Địa Mộc" },
+  { hoaGiap: "Kỷ Hợi", napAm: "Bình Địa Mộc" },
+  { hoaGiap: "Canh Tý", napAm: "Bích Thượng Thổ" },
+  { hoaGiap: "Tân Sửu", napAm: "Bích Thượng Thổ" },
+  { hoaGiap: "Nhâm Dần", napAm: "Kim Bạch Kim" },
+  { hoaGiap: "Quý Mão", napAm: "Kim Bạch Kim" },
+  { hoaGiap: "Giáp Thìn", napAm: "Phú Đăng Hỏa" },
+  { hoaGiap: "Ất Tỵ", napAm: "Phú Đăng Hỏa" },
+  { hoaGiap: "Bính Ngọ", napAm: "Thiên Hà Thủy" },
+  { hoaGiap: "Đinh Mùi", napAm: "Thiên Hà Thủy" },
+  { hoaGiap: "Mậu Thân", napAm: "Đại Trạch Thổ" },
+  { hoaGiap: "Kỷ Dậu", napAm: "Đại Trạch Thổ" },
+  { hoaGiap: "Canh Tuất", napAm: "Thoa Xuyến Kim" },
+  { hoaGiap: "Tân Hợi", napAm: "Thoa Xuyến Kim" },
+  { hoaGiap: "Nhâm Tý", napAm: "Tang Đố Mộc" },
+  { hoaGiap: "Quý Sửu", napAm: "Tang Đố Mộc" },
+  { hoaGiap: "Giáp Dần", napAm: "Đại Khe Thủy" },
+  { hoaGiap: "Ất Mão", napAm: "Đại Khe Thủy" },
+  { hoaGiap: "Bính Thìn", napAm: "Sa Trung Thổ" },
+  { hoaGiap: "Đinh Tỵ", napAm: "Sa Trung Thổ" },
+  { hoaGiap: "Mậu Ngọ", napAm: "Thiên Thượng Hỏa" },
+  { hoaGiap: "Kỷ Mùi", napAm: "Thiên Thượng Hỏa" },
+  { hoaGiap: "Canh Thân", napAm: "Thạch Lựu Mộc" },
+  { hoaGiap: "Tân Dậu", napAm: "Thạch Lựu Mộc" },
+  { hoaGiap: "Nhâm Tuất", napAm: "Đại Hải Thủy" },
+  { hoaGiap: "Quý Hợi", napAm: "Đại Hải Thủy" },
+];
+
+// Hàm lấy Can Chi từ res-*
+function getCanChiFromRes(id) {
+    return document.getElementById(id).textContent.trim();
+}
+
+// Hàm tra Nạp Âm
+function getNapAmFromGiap(hoaGiap) {
+    const item = lucThapHoaGiapNapAm.find(x => x.hoaGiap === hoaGiap);
+    return item ? item.napAm : "-";
+}
+
+// Lấy Hoa Giáp từ res-*
+const hoaGiapNam   = getCanChiFromRes("res-nam");
+const hoaGiapThang = getCanChiFromRes("res-thang");
+const hoaGiapNgay  = getCanChiFromRes("res-ngay");
+const hoaGiapGio   = getCanChiFromRes("res-gio");
+const nnn          = getCanChiFromRes("ketqua");
+
+// Tra Nạp Âm
+const napAmNam   = getNapAmFromGiap(hoaGiapNam);
+const napAmThang = getNapAmFromGiap(hoaGiapThang);
+const napAmNgay  = getNapAmFromGiap(hoaGiapNgay);
+const napAmGio   = getNapAmFromGiap(hoaGiapGio);
+const nnn1       = getNapAmFromGiap(nnn);
+
+// Điền vào 4 ô riêng
+document.getElementById("napam-nam").textContent   = napAmNam;
+document.getElementById("napam-thang").textContent = napAmThang;
+document.getElementById("napam-ngay").textContent  = napAmNgay;
+document.getElementById("napam-gio").textContent   = napAmGio;
+document.getElementById("napam-thai").textContent   = nnn1;
+/////////////////////////////////////////////////////////////////////////////////////////////////
+const bangCungPhi = [
+  { canchi: "Ất Tỵ", nam: "Khôn (- Thổ)", nu: "Khảm (+Thủy)" },
+{ canchi: "Bính Ngọ", nam: "Tốn (-Mộc)", nu: "Khôn (- Thổ)" },
+{ canchi: "Đinh Mùi", nam: "Chấn (+Mộc)", nu: "Chấn (+Mộc)" },
+{ canchi: "Mậu Thân", nam: "Khôn (- Thổ)", nu: "Tốn (-Mộc)" },
+{ canchi: "Kỷ Dậu", nam: "Khảm (+Thủy)", nu: "Cấn (+Thổ)" },
+{ canchi: "Canh Tuất", nam: "Ly (-Hỏa)", nu: "Càn (+Kim)" },
+{ canchi: "Tân Hợi", nam: "Cấn (+Thổ)", nu: "Đoài (-Kim)" },
+{ canchi: "Nhâm Tý", nam: "Đoài (-Kim)", nu: "Cấn (+Thổ)" },
+{ canchi: "Quý Sửu", nam: "Càn (+Kim)", nu: "Ly (-Hỏa)" },
+{ canchi: "Giáp Dần", nam: "Khôn (- Thổ)", nu: "Khảm (+Thủy)" },
+{ canchi: "Ất Mão", nam: "Tốn (-Mộc)", nu: "Khôn (- Thổ)" },
+{ canchi: "Bính Thìn", nam: "Chấn (+Mộc)", nu: "Chấn (+Mộc)" },
+{ canchi: "Đinh Tỵ", nam: "Khôn (- Thổ)", nu: "Tốn (-Mộc)" },
+{ canchi: "Mậu Ngọ", nam: "Khảm (+Thủy)", nu: "Cấn (+Thổ)" },
+{ canchi: "Kỷ Mùi", nam: "Ly (-Hỏa)", nu: "Càn (+Kim)" },
+{ canchi: "Canh Thân", nam: "Cấn (+Thổ)", nu: "Đoài (-Kim)" },
+{ canchi: "Tân Dậu", nam: "Đoài (-Kim)", nu: "Cấn (+Thổ)" },
+{ canchi: "Nhâm Tuất", nam: "Càn (+Kim)", nu: "Ly (-Hỏa)" },
+{ canchi: "Quý Hợi", nam: "Khôn (- Thổ)", nu: "Khảm (+Thủy)" },
+{ canchi: "Giáp Tý", nam: "Tốn (-Mộc)", nu: "Khôn (- Thổ)" },
+{ canchi: "Ất Sửu", nam: "Chấn (+Mộc)", nu: "Chấn (+Mộc)" },
+{ canchi: "Bính Dần", nam: "Khôn (- Thổ)", nu: "Tốn (-Mộc)" },
+{ canchi: "Đinh Mão", nam: "Khảm (+Thủy)", nu: "Cấn (+Thổ)" },
+{ canchi: "Mậu Thìn", nam: "Ly (-Hỏa)", nu: "Càn (+Kim)" },
+{ canchi: "Kỷ Tỵ", nam: "Cấn (+Thổ)", nu: "Đoài (-Kim)" },
+{ canchi: "Canh Ngọ", nam: "Đoài (-Kim)", nu: "Cấn (+Thổ)" },
+{ canchi: "Tân Mùi", nam: "Càn (+Kim)", nu: "Ly (-Hỏa)" },
+{ canchi: "Nhâm Thân", nam: "Khôn (- Thổ)", nu: "Khảm (+Thủy)" },
+{ canchi: "Quý Dậu", nam: "Tốn (-Mộc)", nu: "Khôn (- Thổ)" },
+{ canchi: "Giáp Tuất", nam: "Càn (+Kim)", nu: "Ly (-Hỏa)" },
+{ canchi: "Ất Hợi", nam: "Khôn (- Thổ)", nu: "Tốn (-Mộc)" },
+{ canchi: "Bính Tý", nam: "Khảm (+Thủy)", nu: "Cấn (+Thổ)" },
+{ canchi: "Đinh Sửu", nam: "Ly (-Hỏa)", nu: "Càn (+Kim)" },
+{ canchi: "Mậu Dần", nam: "Cấn (+Thổ)", nu: "Đoài (-Kim)" },
+{ canchi: "Kỷ Mão", nam: "Đoài (-Kim)", nu: "Cấn (+Thổ)" },
+{ canchi: "Canh Thìn", nam: "Càn (+Kim)", nu: "Ly (-Hỏa)" },
+{ canchi: "Tân Tỵ", nam: "Khôn (- Thổ)", nu: "Khảm (+Thủy)" },
+{ canchi: "Nhâm Ngọ", nam: "Tốn (-Mộc)", nu: "Khôn (- Thổ)" },
+{ canchi: "Quý Mùi", nam: "Chấn (+Mộc)", nu: "Chấn (+Mộc)" },
+{ canchi: "Giáp Thân", nam: "Khôn (- Thổ)", nu: "Tốn (-Mộc)" },
+{ canchi: "Ất Dậu", nam: "Khảm (+Thủy)", nu: "Cấn (+Thổ)" },
+{ canchi: "Bính Tuất", nam: "Ly (-Hỏa)", nu: "Càn (+Kim)" },
+{ canchi: "Đinh Hợi", nam: "Cấn (+Thổ)", nu: "Đoài (-Kim)" },
+{ canchi: "Mậu Tý", nam: "Đoài (-Kim)", nu: "Cấn (+Thổ)" },
+{ canchi: "Kỷ Sửu", nam: "Càn (+Kim)", nu: "Ly (-Hỏa)" },
+{ canchi: "Canh Dần", nam: "Khôn (- Thổ)", nu: "Khảm (+Thủy)" },
+{ canchi: "Tân Mão", nam: "Tốn (-Mộc)", nu: "Khôn (- Thổ)" },
+{ canchi: "Nhâm Thìn", nam: "Chấn (+Mộc)", nu: "Chấn (+Mộc)" },
+{ canchi: "Quý Tỵ", nam: "Khôn (- Thổ)", nu: "Tốn (-Mộc)" },
+{ canchi: "Giáp Ngọ", nam: "Khảm (+Thủy)", nu: "Cấn (+Thổ)" },
+{ canchi: "Ất Mùi", nam: "Ly (-Hỏa)", nu: "Càn (+Kim)" },
+{ canchi: "Bính Thân", nam: "Cấn (+Thổ)", nu: "Đoài (-Kim)" },
+{ canchi: "Đinh Dậu", nam: "Đoài (-Kim)", nu: "Cấn (+Thổ)" },
+{ canchi: "Mậu Tuất", nam: "Càn (+Kim)", nu: "Ly (-Hỏa)" },
+{ canchi: "Kỷ Hợi", nam: "Khôn (- Thổ)", nu: "Khảm (+Thủy)" },
+{ canchi: "Canh Tý", nam: "Tốn (-Mộc)", nu: "Khôn (- Thổ)" },
+{ canchi: "Tân Sửu", nam: "Chấn (+Mộc)", nu: "Chấn (+Mộc)" },
+{ canchi: "Nhâm Dần", nam: "Khôn (- Thổ)", nu: "Tốn (-Mộc)" },
+{ canchi: "Quý Mão", nam: "Khảm (+Thủy)", nu: "Cấn (+Thổ)" },
+{ canchi: "Giáp Thìn", nam: "Ly (-Hỏa)", nu: "Càn (+Kim)" },
+{ canchi: "Ất Tỵ", nam: "Cấn (+Thổ)", nu: "Đoài (-Kim)" },
+{ canchi: "Bính Ngọ", nam: "Đoài (-Kim)", nu: "Cấn (+Thổ)" },
+{ canchi: "Đinh Mùi", nam: "Càn (+Kim)", nu: "Ly (-Hỏa)" },
+{ canchi: "Mậu Thân", nam: "Khôn (- Thổ)", nu: "Khảm (+Thủy)" },
+{ canchi: "Kỷ Dậu", nam: "Tốn (-Mộc)", nu: "Khôn (- Thổ)" },
+{ canchi: "Canh Tuất", nam: "Chấn (+Mộc)", nu: "Chấn (+Mộc)" },
+{ canchi: "Tân Hợi", nam: "Khôn (- Thổ)", nu: "Tốn (-Mộc)" },
+{ canchi: "Nhâm Tý", nam: "Khảm (+Thủy)", nu: "Cấn (+Thổ)" },
+{ canchi: "Quý Sửu", nam: "Ly (-Hỏa)", nu: "Càn (+Kim)" },
+{ canchi: "Giáp Dần", nam: "Cấn (+Thổ)", nu: "Đoài (-Kim)" },
+{ canchi: "Ất Mão", nam: "Đoài (-Kim)", nu: "Cấn (+Thổ)" },
+{ canchi: "Bính Thìn", nam: "Càn (+Kim)", nu: "Ly (-Hỏa)" },
+{ canchi: "Đinh Tỵ", nam: "Khôn (- Thổ)", nu: "Khảm (+Thủy)" },
+{ canchi: "Mậu Ngọ", nam: "Tốn (-Mộc)", nu: "Khôn (- Thổ)" },
+{ canchi: "Kỷ Mùi", nam: "Chấn (+Mộc)", nu: "Chấn (+Mộc)" },
+{ canchi: "Canh Thân", nam: "Khôn (- Thổ)", nu: "Tốn (-Mộc)" },
+{ canchi: "Tân Dậu", nam: "Khảm (+Thủy)", nu: "Cấn (+Thổ)" },
+{ canchi: "Nhâm Tuất", nam: "Ly (-Hỏa)", nu: "Càn (+Kim)" },
+{ canchi: "Quý Hợi", nam: "Cấn (+Thổ)", nu: "Đoài (-Kim)" },
+{ canchi: "Giáp Tý", nam: "Đoài (-Kim)", nu: "Cấn (+Thổ)" },
+{ canchi: "Ất Sửu", nam: "Càn (+Kim)", nu: "Ly (-Hỏa)" },
+{ canchi: "Bính Dần", nam: "Khôn (- Thổ)", nu: "Khảm (+Thủy)" },
+{ canchi: "Đinh Mão", nam: "Tốn (-Mộc)", nu: "Khôn (- Thổ)" },
+{ canchi: "Mậu Thìn", nam: "Chấn (+Mộc)", nu: "Chấn (+Mộc)" },
+{ canchi: "Kỷ Tỵ", nam: "Khôn (- Thổ)", nu: "Tốn (-Mộc)" },
+{ canchi: "Canh Ngọ", nam: "Khảm (+Thủy)", nu: "Cấn (+Thổ)" },
+{ canchi: "Tân Mùi", nam: "Ly (-Hỏa)", nu: "Càn (+Kim)" },
+{ canchi: "Nhâm Thân", nam: "Cấn (+Thổ)", nu: "Đoài (-Kim)" },
+{ canchi: "Quý Dậu", nam: "Đoài (-Kim)", nu: "Cấn (+Thổ)" },
+{ canchi: "Giáp Tuất", nam: "Càn (+Kim)", nu: "Ly (-Hỏa)" },
+{ canchi: "Ất Hợi", nam: "Khôn (- Thổ)", nu: "Khảm (+Thủy)" },
+{ canchi: "Bính Tý", nam: "Tốn (-Mộc)", nu: "Khôn (- Thổ)" },
+{ canchi: "Đinh Sửu", nam: "Chấn (+Mộc)", nu: "Chấn (+Mộc)" },
+{ canchi: "Mậu Dần", nam: "Khôn (- Thổ)", nu: "Tốn (-Mộc)" },
+{ canchi: "Kỷ Mão", nam: "Khảm (+Thủy)", nu: "Cấn (+Thổ)" },
+{ canchi: "Canh Thìn", nam: "Ly (-Hỏa)", nu: "Càn (+Kim)" },
+{ canchi: "Tân Tỵ", nam: "Cấn (+Thổ)", nu: "Đoài (-Kim)" },
+{ canchi: "Nhâm Ngọ", nam: "Đoài (-Kim)", nu: "Cấn (+Thổ)" },
+{ canchi: "Quý Mùi", nam: "Càn (+Kim)", nu: "Ly (-Hỏa)" },
+{ canchi: "Giáp Thân", nam: "Khôn (- Thổ)", nu: "Khảm (+Thủy)" },
+{ canchi: "Ất Dậu", nam: "Tốn (-Mộc)", nu: "Khôn (- Thổ)" },
+{ canchi: "Bính Tuất", nam: "Chấn (+Mộc)", nu: "Chấn (+Mộc)" },
+{ canchi: "Đinh Hợi", nam: "Khôn (- Thổ)", nu: "Tốn (-Mộc)" },
+{ canchi: "Mậu Tý", nam: "Khảm (+Thủy)", nu: "Cấn (+Thổ)" },
+{ canchi: "Kỷ Sửu", nam: "Ly (-Hỏa)", nu: "Càn (+Kim)" },
+{ canchi: "Canh Dần", nam: "Cấn (+Thổ)", nu: "Đoài (-Kim)" },
+{ canchi: "Tân Mão", nam: "Đoài (-Kim)", nu: "Cấn (+Thổ)" },
+{ canchi: "Nhâm Thìn", nam: "Càn (+Kim)", nu: "Ly (-Hỏa)" },
+{ canchi: "Quý Tỵ", nam: "Khôn (- Thổ)", nu: "Khảm (+Thủy)" },
+{ canchi: "Giáp Ngọ", nam: "Tốn (-Mộc)", nu: "Khôn (- Thổ)" },
+{ canchi: "Ất Mùi", nam: "Chấn (+Mộc)", nu: "Chấn (+Mộc)" },
+{ canchi: "Bính Thân", nam: "Khôn (- Thổ)", nu: "Tốn (-Mộc)" },
+{ canchi: "Đinh Dậu", nam: "Khảm (+Thủy)", nu: "Cấn (+Thổ)" },
+{ canchi: "Mậu Tuất", nam: "Ly (-Hỏa)", nu: "Càn (+Kim)" }
+];
+
+const menhquai = {
+  "Càn": ["Đoài (-Kim)", "Cấn (+Thổ)","Khôn (- Thổ)"],
+  "Đoài": ["Càn (+Kim)", "Cấn (+Thổ)", "Khôn (- Thổ)"],
+  "Ly": ["Chấn (+Mộc)", "Tốn (-Mộc)", "Khảm (+Thủy)"],
+  "Chấn": ["Tốn (-Mộc)", "Ly (-Hỏa)", "Khảm (+Thủy)"],
+  "Tốn": ["Chấn (+Mộc)", "Ly (-Hỏa)", "Khảm (+Thủy)"],
+  "Khảm": ["Ly (-Hỏa)", "Chấn (+Mộc)", "Tốn (-Mộc)",],
+  "Cấn": ["Khôn (- Thổ)", "Càn (+Kim)", "Đoài (-Kim)"],
+  "Khôn": ["Cấn (+Thổ)", "Càn (+Kim)", "Đoài (-Kim)"]
+};
+
+function timCungPhi(canChi) {
+  return bangCungPhi.find(x => x.canchi === canChi) || null;
+}
+
+// Hàm lấy Can Chi từ res-*
+function getCanChiFromRes(id) {
+    return document.getElementById(id).textContent.trim();
+}
+
+const mm  = getCanChiFromRes("res-nam"); 
+// Ví dụ: Giáp Tuất
+
+const ketQua = timCungPhi(mm);
+
+if (ketQua) {
+    document.getElementById("cung-nam").innerText = ketQua.nam;
+    document.getElementById("cung-nu").innerText = ketQua.nu;
+    document.getElementById("cung-nam2").innerText = ketQua.nam;
+
+} 
+// Hàm tính các cung hợp theo mệnh quái
+function hienThiCungHop(idCung, idOutput) {
+    const cungFull = document.getElementById(idCung).textContent.trim();
+    if (!cungFull) return;
+
+    // Lấy chữ cái đầu, bỏ (+Hỏa) / (-Thổ) nếu có
+    const cung = cungFull.split(' ')[0]; 
+
+    // Lấy các cung hợp
+    const hopCung = menhquai[cung] || [];
+    document.getElementById(idOutput).innerHTML = hopCung.join('<br>');
+}
+        hienThiCungHop("cung-nam", "cung-nam1");
+        hienThiCungHop("cung-nu", "cung-nu1");
+////////////////////////////////////////////////////////////////////////
+// Hàm lấy Can Chi từ res-*
+function getCanChiFromRes(id) {
+    return document.getElementById(id).textContent.trim();
+}
+
+// Bảng tuổi tuyệt (theo Địa Chi)
+const tuoiTuyet = {
+  "Tý": "Tỵ",
+  "Hợi": "Ngọ",
+  "Dậu": "Dần",
+  "Thân": "Mão",
+   "Tỵ": "Tý",
+  "Ngọ": "Hợi",
+  "Dần": "Dậu",
+  "Mão": "Thân",
+  "Thìn": "Tuất",
+  "Tuất": "Thìn",
+};
+
+// Hàm lấy Địa Chi từ Can Chi (ví dụ: "Bính Tý" -> "Tý")
+function getDiaChi(canChi) {
+    // Tách chuỗi theo khoảng trắng, lấy phần cuối
+    return canChi.split(" ").pop();
+}
+
+// Hàm tra tuổi tuyệt
+function getTuoiTuyet(canChi) {
+    const diaChi = getDiaChi(canChi);
+    return tuoiTuyet[diaChi] || "Không phạm";
+}
+
+// Ví dụ sử dụng
+const canChiNam = getCanChiFromRes("res-nam"); // giả sử nội dung là "Bính Tý"
+const kq = getTuoiTuyet(canChiNam);
+document.getElementById("ketqua1").innerText =  kq;
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Bảng mô tả mệnh tốt theo Can
+   const menhTot = {
+    "Giáp": `Người Giáp mộc nên cao lớn, uy mãnh,nếu ở đồng bằng không phù hợp thì phải lên núi để sinh sống. <br>
+             Là người có xương đầu to, trán cao bằng và rộng. Khuôn mặt dễ gần, dễ mến, lời nói gần, dễ nghe, dễ hiểu. 
+             Sẵn sàng chia sẻ và giúp đỡ những người có khó khăn. Không xăm soi người khác, luôn để lại ấn tượng cho người khác, sống đàng hoàng, đĩnh đạc. 
+             Là người có tâm đức, luôn học hỏi, hợp với những người cùng chí hướng. Thích ăn thịt.<br> Sống kín đáo, cẩn mật, không nói nhiều mới hợp duyên trời định 
+             Dễ có bệnh về khu vực đầu, gân, gan mật và huyết áp cao<br> Buôn bán về đất sẽ có tài lộc.Nam giới thuộc Giáp Mộc, 
+             phần lớn đều là những nhân sĩ chuyên nghiệp hoặc người có thành tựu, thuộc tầng lớp khá cao trong xã hội.phải trải qua khó khăn mới có thể hành vận tốt
+             Nếu phụ nữ là Giáp Mộc,cần lấy chồng Canh Kim để chặt đẽo,bị người khác phê bình hoặc chỉ trích mới có vận tốt 
+             Thứ khắc chế được bạn chính là thị phi, gian khó, giả dụ bạn không may vướng phải kiện tụng, bị trách mắng, dằn vặt, những điều đó sẽ rất tốt cho bạn. `,
+    "Ất": `Người Ất mộc nên nho nhã, tinh tế`,
+    "Bính": `Người Bính hỏa nên béo tốt`,
+    "Đinh": `Người Đinh hỏa nên nhỏ nhắn`,
+    "Mậu": `Người Mậu thổ nên cường tráng, rắn chắc như đá`,
+    "Kỷ": `Người Kỷ thổ nên mềm dẻo, khéo léo`,
+   "Canh":`- Người Canh kim nên hào phóng, cởi mở; phụ nữ cũng vậy, nam giới cần mạnh mẽ, hào sảng,cần phải được tôi luyện gọt giũa mới có thể thành công,
+                         <br>- Chỉ cần người Canh kim gặp người Đinh hỏa, chắc chắn sẽ hiển quý phát tài; 
+                         <br> - Cuộc đời sẽ gặp nhiều sóng gió, trắc trở, đặc biệt là về phương diện tình yêu và hôn nhân. 
+                         <br>- Vì “Canh biến vi cô” nên sẽ có những nỗi khổ chỉ một mình mình biết, nếu đã xảy ra lúc nhỏ thì lớn lên không bị nữa. 
+                         <br>- Trong quá trình làm việc, công tác thường có lúc đơn độc phải tự quyết định, tự chiến đấu. 
+                         <br>- Sẽ phải lĩnh hậu quả về kiếp nạn đời này nếu nợ kiếp trước hoặc sẽ gánh chịu bởi “nhân quả” của dòng tộc. 
+                         <br>- Người mang thiên can “CANH” nếu chịu tu luyện Phật pháp, 
+                         làm nhiều phúc đức cho chúng sinh sẽ tự giải thoát được cho chính mình nỗi nghiệp oan trái. 
+                         <br>- Người có thiên can “CANH” có lợi nhiều hơn thiên can khác là kiếm tiền rất dễ dàng, nhưng chặt chẽ về đồng tiền nên rất phù hợp với nghề kế toán, thủ quỹ. Nếu “CANH” thiên về “Càn” nhiều sẽ giỏi ngoại giao, nắm tâm lý người khác rất tốt. 
+                       <br>- Bệnh thường gặp ở người có thiên can “CANH” là: xương cốt, gân, phổi, ruột già, gan và chân.            
+                          `,
+    "Tân": `Người Tân kim là kim trang trí, nên yếu đuối, kín đáo`,
+    "Nhâm": `Người Nhâm thủy nên uyển chuyển, linh hoạt`,
+    "Quý": `Người Quý thủy nên nhẹ nhàng, dịu dàng`
+};
+
+
+// Hàm lấy Can từ res-*
+function getCanFromRes(id) {
+    const canChi = document.getElementById(id).textContent.trim();
+    return canChi.split(" ")[0]; // Lấy Can (phần đầu)
+}
+
+// Hàm lấy mô tả mệnh tốt theo Can
+function getMenhTot(can) {
+    return menhTot[can] || "Không có thông tin";
+}
+
+// Ví dụ sử dụng
+const canNam1 = getCanFromRes("res-ngay"); // hoặc res-ngay
+const moTaMenhTot = getMenhTot(canNam1);
+document.getElementById("ketqua5").innerHTML = moTaMenhTot;
+/////////////////////////////////////////////////////////////////////////////////////
+const cungPhiMap = {
+  "Càn (+Kim)": "Đại diện cho Trời, mang năng lượng mạnh mẽ, cứng rắn, quyết đoán. Người thuộc cung này thường có tố chất lãnh đạo, sống nguyên tắc và đề cao danh dự. Tuy nhiên, cũng dễ bảo thủ nếu không kiểm soát tốt bản thân.",
+  "Khảm (+Thủy)": "Tượng trưng cho nước, tính cách linh hoạt, sâu sắc, biết thích nghi. Người cung Khảm thường thông minh, cẩn trọng và có trực giác mạnh. Tuy nhiên, nếu năng lượng Thủy mất cân bằng, dễ dẫn đến lo lắng, bất an.",
+  "Cấn (+Thổ)": "Đại diện cho núi non, sự ổn định, vững chắc và điềm đạm. Người thuộc cung Cấn thường kiên trì, bền bỉ và có khả năng tích lũy. Nhược điểm là đôi khi quá chậm chạp, thiếu linh hoạt.",
+  "Chấn (+Mộc)": "Biểu tượng cho sấm sét và sự khai mở. Người thuộc cung Chấn có năng lượng dồi dào, dám nghĩ dám làm, thích khám phá và đổi mới. Nhưng họ cũng dễ nóng vội, hấp tấp nếu không rèn luyện tính kiên nhẫn.",
+  "Tốn (-Mộc)": "Đại diện cho gió, thể hiện sự mềm mại, uyển chuyển, giàu lòng cảm thông. Người cung Tốn thường khéo léo, có khả năng ngoại giao tốt, thích hợp trong các công việc cần giao tiếp. Tuy nhiên, đôi khi thiếu quyết đoán.",
+  "Ly (-Hỏa)": "Tượng trưng cho ánh sáng, trí tuệ, đam mê. Người cung Ly thường năng động, nhiệt huyết, có tầm nhìn xa và khả năng truyền cảm hứng. Nhược điểm là dễ căng thẳng, bốc đồng nếu không cân bằng cảm xúc.",
+  "Khôn (-Thổ)": "Biểu trưng cho đất mẹ, bao dung, ổn định và chu toàn. Người cung Khôn thường thực tế, chăm chỉ và có thiên hướng phục vụ, hỗ trợ người khác. Tuy nhiên, dễ bị ảnh hưởng bởi người xung quanh nếu thiếu bản lĩnh.",
+  "Đoài (-Kim)": "Đại diện cho hồ ao, thể hiện sự vui vẻ, hòa nhã và thân thiện. Người thuộc cung Đoài thường có lối sống tích cực, dễ gần, sáng tạo trong công việc. Nhưng nếu năng lượng Kim quá vượng, dễ dẫn đến thụ động hoặc phụ thuộc."
+};
+
+// Lấy tên cung từ HTML
+function getCungFromHTML() {
+    return document.getElementById("cung-nam").textContent.trim();
+}
+
+// Lấy mô tả từ map
+function hienThiMoTaCung() {
+    const cung = getCungFromHTML();  
+    const moTa = cungPhiMap[cung] || "Không tìm thấy dữ liệu.";
+
+    document.getElementById("mo-ta-cung").innerHTML = moTa;
+}
+
+hienThiMoTaCung();
+
+///////////////////////////////////////////////////////////////////////////////////
+     const chiThanCuMap = {
+  Tý:  `Thân cư Mệnh: <br> Người Thân cư Mệnh bất kể cuộc đời họ có thịnh vượng hay khó khăn, thường không xuất hiện những biến động đột ngột hay những sự thay đổi lớn làm thay đổi toàn bộ cuộc đời của họ.
+                           <br>Nếu người đó bắt đầu cuộc đời của mình với sự giàu có thì thường sẽ duy trì tình trạng giàu có trong suốt cuộc đời và ngược lại, 
+                           nếu họ bắt đầu với tình hình kinh tế khó khăn, thì thường sẽ tiếp tục gặp khó khăn trong phần còn lại, không có sự biến đổi lớn`,
+  Sửu: `Thân cư Phúc Đức : <br>Người Thân cư Phúc Đức là những người có tinh thần gia đình, gia tộc rất mạnh. 
+                           Họ thích cuộc sống đại gia đình và giữ được những liên hệ mật thiết với tất cả bà con trong dòng họ dù gần hay xa. Họ lo lắng cho bố mẹ, lo việc cho họ hàng cô dì chú bác, đôi lúc đi xa nhà là thường có cảm giác nhớ nhà, không chịu được dễ phải quay trở về quê hương sinh sống
+                           <br>Đây là mẫu người rất nặng tình quê hương. Họ thường lớn lên và sống suốt đời tại nơi chôn nhau cắt rốn của mình chứ không muốn ly hương hay sống rời xa dòng họ của mình.
+                           Người này dễ bị ảnh hưởng bởi yếu tố tiền bạc.`,
+  Dần: `Thân cư Quan Lộc : <br>Người Thân Cư Quan Lộc không thích làm những nghề có tính cách tạm bợ. có khuynh hướng độc lập rất mạnh,
+                           <br>Cho nên khi họ đã bước vào một ngành nghề nào thì đó sẽ là công việc mà họ sẽ theo đuổi suốt cả một đời. 
+                          <br>Mẫu người này cho dù làm công hay làm chủ cũng không thích đổi nghề. Nếu đi làm công thì ít khi bị mất việc.`,
+  Mão: `Thân cư Thiên Di: <br>Người này tính thích hoạt động, thích cuộc sống phải có sự thay đổi cũng như thích di chuyển
+                           họ thích cuộc sống bên ngoài hơn là cuộc sống trong gia đình,thích làm những nghề có tính cách di động, thường được đi đây, đi đó, tiếp xúc với nhiều người... 
+                           <br>là mẫu người việc nhà thì nhác, việc chú bác thì siêng. Họ sinh ra để làm việc, để hoạt động và có máu giang hồ, cho nên thường thích ra đời sớm, thích sống xa nhà, xa quê hương cho thỏa chí tang bồng.`,
+  Thìn:`Thân cư Tài Bạch : <br>Người Thân cư Tài Bạch Người Thân cư Tài Bạch luôn coi trọng vấn đề tiền bạc và xem đó là mục tiêu sống của mình. 
+                           Những người này không đơn giản chỉ có quan điểm sống vì tiền mà còn có năng lực kiếm tiền và quản lý tài chính tốt.
+                           Họ không bao giờ từ chối hay bỏ qua bất kỳ cơ hội nào để tăng thu nhập hoặc nổi tiếng. 
+                           Người này luôn hành động quyết đoán, chịu đựng gian khổ, làm việc không ngừng để đạt được mục tiêu.
+                           Tuy giàu có nhưng cô đơn và không hạnh phúc. Có thể có một ngôi nhà to đẹp nhưng lại thiếu ấm áp và yêu thương, trở nên giàu có về vật chất nhưng nghèo nàn về tinh thần
+                           Họ có tài năng và kỹ năng để đứng đầu, quản lý và phát triển trong sự nghiệp. Mẫu người này thường khép kín và ít thể hiện được cảm xúc của mình với người thân và bạn bè. 
+                           Vì thế mà trong tình yêu, mẫu người này cũng kém may mắn`,
+  Tỵ:  `Thân cư Phu Thê : <br>Người Thân cư Phu Thê người này có cuộc sống tình cảm và gia đình rất quan trọng, chịu ảnh hưởng lớn bởi ý kiến và thái độ của người phối ngẫu.
+                          <br>Người thân cư Phu Thê và người hôn phối thường làm cùng một ngành nghề hay cùng chung một doanh nghiệp với nhau. <br>Nếu không cùng nghề nghiệp, công việc của họ cũng có sự liên quan và hỗ trợ lẫn nhau.
+                             Họ có thể gặp người chồng/vợ mình trong một hoàn cảnh đặc biệt, như đã quen biết từ kiếp trước hay có duyên nợ chưa tròn.
+                             Người này có tâm tính cứng nhắc trong công việc, sẵn sàng vì gia đình mà cố gắng làm việc chăm chỉ, nâng cao điều kiện sống cho người nhà. 
+                             <br>Họ có sự tôn trọng cao độ với người trong nhà, nhất là với nửa kia của mình. 
+                             Đây là mẫu người biết lo lắng cho gia đình, là người bạn đời đáng tin cậy.có một sở thích hay một đam mê nào đó bên cạnh nghề chính của mình. Ban đầu, sở thích hay đam mê này chỉ là một cách để họ giải trí hay thỏa mãn niềm đam mê. 
+                             Nhưng dần dần, nó có thể trở thành một phần quan trọng trong cuộc sống của người này.`,
+  Ngọ:  `Thân cư Mệnh: <br> Người Thân cư Mệnh bất kể cuộc đời họ có thịnh vượng hay khó khăn, thường không xuất hiện những biến động đột ngột hay những sự thay đổi lớn làm thay đổi toàn bộ cuộc đời của họ.
+                           <br>Nếu người đó bắt đầu cuộc đời của mình với sự giàu có thì thường sẽ duy trì tình trạng giàu có trong suốt cuộc đời và ngược lại, 
+                           nếu họ bắt đầu với tình hình kinh tế khó khăn, thì thường sẽ tiếp tục gặp khó khăn trong phần còn lại, không có sự biến đổi lớn`,
+  Mùi: `Thân cư Phúc Đức : <br>Người Thân cư Phúc Đức là những người có tinh thần gia đình, gia tộc rất mạnh. 
+                           Họ thích cuộc sống đại gia đình và giữ được những liên hệ mật thiết với tất cả bà con trong dòng họ dù gần hay xa. Họ lo lắng cho bố mẹ, lo việc cho họ hàng cô dì chú bác, đôi lúc đi xa nhà là thường có cảm giác nhớ nhà, không chịu được dễ phải quay trở về quê hương sinh sống
+                           <br>Đây là mẫu người rất nặng tình quê hương. Họ thường lớn lên và sống suốt đời tại nơi chôn nhau cắt rốn của mình chứ không muốn ly hương hay sống rời xa dòng họ của mình.
+                           Người này dễ bị ảnh hưởng bởi yếu tố tiền bạc.`,
+  Thân: `Thân cư Quan Lộc : <br>Người Thân Cư Quan Lộc không thích làm những nghề có tính cách tạm bợ. có khuynh hướng độc lập rất mạnh,
+                           <br>Cho nên khi họ đã bước vào một ngành nghề nào thì đó sẽ là công việc mà họ sẽ theo đuổi suốt cả một đời. 
+                          <br>Mẫu người này cho dù làm công hay làm chủ cũng không thích đổi nghề. Nếu đi làm công thì ít khi bị mất việc.`,
+  Dậu: `Thân cư Thiên Di: <br>Người này tính thích hoạt động, thích cuộc sống phải có sự thay đổi cũng như thích di chuyển
+                           họ thích cuộc sống bên ngoài hơn là cuộc sống trong gia đình,thích làm những nghề có tính cách di động, thường được đi đây, đi đó, tiếp xúc với nhiều người... 
+                           <br>là mẫu người việc nhà thì nhác, việc chú bác thì siêng. Họ sinh ra để làm việc, để hoạt động và có máu giang hồ, cho nên thường thích ra đời sớm, thích sống xa nhà, xa quê hương cho thỏa chí tang bồng.`,
+  Tuất:`Thân cư Tài Bạch : <br>Người Thân cư Tài Bạch Người Thân cư Tài Bạch luôn coi trọng vấn đề tiền bạc và xem đó là mục tiêu sống của mình. 
+                           Những người này không đơn giản chỉ có quan điểm sống vì tiền mà còn có năng lực kiếm tiền và quản lý tài chính tốt.
+                           Họ không bao giờ từ chối hay bỏ qua bất kỳ cơ hội nào để tăng thu nhập hoặc nổi tiếng. 
+                           Người này luôn hành động quyết đoán, chịu đựng gian khổ, làm việc không ngừng để đạt được mục tiêu.
+                           Tuy giàu có nhưng cô đơn và không hạnh phúc. Có thể có một ngôi nhà to đẹp nhưng lại thiếu ấm áp và yêu thương, trở nên giàu có về vật chất nhưng nghèo nàn về tinh thần
+                           Họ có tài năng và kỹ năng để đứng đầu, quản lý và phát triển trong sự nghiệp. Mẫu người này thường khép kín và ít thể hiện được cảm xúc của mình với người thân và bạn bè. 
+                           Vì thế mà trong tình yêu, mẫu người này cũng kém may mắn`,
+  Hợi:  `Thân cư Phu Thê : <br>Người Thân cư Phu Thê người này có cuộc sống tình cảm và gia đình rất quan trọng, chịu ảnh hưởng lớn bởi ý kiến và thái độ của người phối ngẫu.
+                          <br>Người thân cư Phu Thê và người hôn phối thường làm cùng một ngành nghề hay cùng chung một doanh nghiệp với nhau. <br>Nếu không cùng nghề nghiệp, công việc của họ cũng có sự liên quan và hỗ trợ lẫn nhau.
+                             Họ có thể gặp người chồng/vợ mình trong một hoàn cảnh đặc biệt, như đã quen biết từ kiếp trước hay có duyên nợ chưa tròn.
+                             Người này có tâm tính cứng nhắc trong công việc, sẵn sàng vì gia đình mà cố gắng làm việc chăm chỉ, nâng cao điều kiện sống cho người nhà. 
+                             <br>Họ có sự tôn trọng cao độ với người trong nhà, nhất là với nửa kia của mình. 
+                             Đây là mẫu người biết lo lắng cho gia đình, là người bạn đời đáng tin cậy.có một sở thích hay một đam mê nào đó bên cạnh nghề chính của mình. Ban đầu, sở thích hay đam mê này chỉ là một cách để họ giải trí hay thỏa mãn niềm đam mê. 
+                             Nhưng dần dần, nó có thể trở thành một phần quan trọng trong cuộc sống của người này.`
+};
+
+// Tách CHI từ res-gio (vd: "Mậu Dần")
+function getChiFromResGio() {
+    const text = document.getElementById("res-gio").textContent.trim();
+    const parts = text.split(" ");   
+    return parts[1] || "";           
+}
+
+// Xử lý và hiện ra ô ketQua7
+function xuLyThanCuGio() {
+    const chi = getChiFromResGio();     
+    const ketQua = chiThanCuMap[chi] || "";  
+
+    document.getElementById("ketQua7").innerHTML =
+        `${ketQua}<br><span style="font-size: smaller; color: gray;"></span>`;
+}
+
+xuLyThanCuGio();
+/////////////////////////////////////////////////////////////////////////
+const gioSinhMap = {
+  "Tý": `Giờ Tý (23h – 1h): Hài hước, lạc quan.
+Người sinh vào giờ Tý thường được hưởng phước đức lớn. Dù đường đời trải qau nhiều vận hạn, trở ngại nhưng cuối cùng vẫn tốt đẹp.
+
+Có số đào hoa nên từ nhỏ đã có nhiều bạn khác giới. Họ cũng thường có ngoại hình ưa nhìn và đường tình duyên suôn sẻ.
+
+Người sinh giờ Tý thường không được thừa hưởng tài sản từ gia đình. Mà phải tự lập và tự gây dựng sự nghiệp từ tay trắng. Nhưng cuối họ vẫn làm nên nghiệp lớn nhờ bản lĩnh kiên cường..`,
+
+  "Sửu": `Giờ Sửu (1h – 3h): Ngang bướng, ít nói.
+Người sinh giờ Sửu thường ít nói nhưng lại rất cứng đầu. Nhưng thường họ lại có bản tính kiên cường, chăm chỉ, chịu thương chịu khó và không bỏ cuộc. Nhờ vậy tương lai cũng rộng mở và có thể nắm quyền lực trong tay..`,
+
+  "Dần": `Giờ Dần (3h – 5h): Bí ẩn, mạnh mẽ.
+Người sinh giờ Dần có đầy tham vọng và không ngại đấu tranh để giành quyền lợi. Ra đời không dễ bị bắt nạt, đôi khi còn làm đại ca. Họ có tính từ lập và thường thành công từ rất trẻ, có thể đạt tới đỉnh cao trong cuộc sống.`,
+
+  "Mão": `Giờ Mão (5h – 7h): Khí chất cao quý.
+Người sinh giờ Mão thường thông minh và nhanh nhạy. Nên họ thường là những người học giỏi, đạt thành tích cao.
+
+Nhưng họ có nhược điểm là tiêu xài hoang phí. Phải đến tuổi trung niên, sau khi lập gia đình thì mới có thể giàu được.`,
+
+  "Thìn": `Giờ Thìn (7h – 9h): Trời ban vận mệnh may mắn.
+Người sinh giờ Thìn là những người sung sướng. Họ thường nhận được nhiều may mắn hơn những người khác. Thường có cuộc sống giàu có, xa hoa và được gia đình bảo bọc từ thuở nhỏ.
+
+Người sinh giờ Thìn cũng biết cách quản lý tiền bạc và có những ý tưởng kiếm tiền.`,
+
+  "Tỵ": `Giờ Tỵ (9h – 11h): Hài hước, giỏi giao tiếp.
+Người sinh giờ Tỵ có đầu óc thông minh và giỏi giao tiếp. Họ thường có mối quan hệ rộng, có năng khiếu trong lĩnh vực truyền thông, kinh doanh và luật.
+
+Những người sinh giờ Tỵ thường không được hưởng tài sản từ gia đình, thậm chí đôi khi còn sinh ra trong những gia đình không có điều kiện. Nhưng nhờ vậy mà những người này biết nỗ lực và cầu tiến rất nhiều..`,
+
+  "Ngọ": `Giờ Ngọ (11h – 13h): Tướng mạo thanh tú.
+Người sinh vào giờ Ngọ thường có ngoại hình xinh đẹp, ưa nhìn và rất thu hút mọi người. Họ cũng rất thông minh và có tài ăn nói. Trong đường đời gặp nhiều may mắn và được nhiều quý nhân giúp đỡ..`,
+
+  "Mùi": `Giờ Mùi (13h – 15h): Tính trẻ con, dễ bị thu hút.
+Người sinh giờ mùi thường năng động và có tính cách như trẻ con. Thường tin người và hay bị kẻ xấu lợi dụng, cả về tình cảm lẫn tiền bạc. Họ thường phải trải qua những biến cố lớn trong cuộc đời thì mới trưởng thành được.`,
+
+  "Thân": `Giờ Thân (15h – 17h): Giỏi giao tiếp.
+Người sinh vào giờ Thân thường có tính náo động, thích tạo sự náo nhiệt, ồn ào. Đây là những hoạt náo viên hoàn hảo.
+
+Nhưng người sinh giờ Thân có nhược điểm là hay đa nghi, nên thường gia đình không hạnh phúc, hay cãi vã. Người sinh giờ Thân cũng có vận mệnh lận đận, muốn thành công về tài lộc thì bắt buộc phải đi xa.`,
+
+  "Dậu": `Giờ Dậu (17h – 19h): Óc thẩm mỹ, nhiều tài lẻ.
+Người sinh giờ Dậu thường rất thông minh, có nhiều tài lẻ, có óc thẩm mỹ và có khiếu về các môn nghệ thuật. Họ thường có cuộc sống khấm khá, không phải đau đầu vì chuyện tiền bạc.
+
+Nhưng người sinh giờ Dậu thường có tính nóng nảy, dễ cáu gắt nên không được lòng người khác. Tới khoảng 35-40 tuổi thì họ mới có cơ hội khẳng định mình..`,
+
+  "Tuất": `Giờ Tuất (19h – 21h): Không thân thiện.
+Người sinh giờ Tuất sẽ rất vất vả, họ có vận mệnh thăng trầm, lúc lên lúc xuống, lại có tính đứng núi này trông núi nọ. Thuở nhỏ thường bị hiểu lầm, lớn lên cũng gặp khó khăn, gian nan, đường tình duyên trắc trở.`,
+
+  "Hợi": `Giờ Hợi (21h – 23h): Có đầu óc kinh doanh.
+Người sinh giờ Hợi chững chạc và trưởng thành trước tuổi, có lòng bác ái. Họ có vận mệnh ổn định, không nhiều thăng trầm. Cuộc sống tương đối tốt, không bị lận đận, khổ sở vì tiền bạc..`  
+};
+
+// Tách CHI từ res-gio (ví dụ: "Mậu Dần" => lấy "Dần")
+function getChiFromResGio() {
+    const text = document.getElementById("res-gio").textContent.trim();
+    const parts = text.split(" ");
+    return parts[1] || "";
+}
+
+function xuLyGioSinh() {
+    const chi = getChiFromResGio();      
+    const moTa = gioSinhMap[chi] || "";
+
+    // Nhét Chi vào ô riêng
+    document.getElementById("ketQuaChi").innerHTML = chi;
+
+    // Nhét mô tả vào ô khác
+    document.getElementById("ketQuaMoTa").innerHTML = moTa;
+}
+xuLyGioSinh();
+
+///////////////////////////////////////////////////////////////////
+const gioSinhTheoTuoi = {
+    
+    "Tý": {
+        "Tý": `Người tuổi Tý sinh giờ Tý gặp nhiều may mắn, thuận lợi trong sự nghiệp. 
+               Bản mệnh có cách cư xử khéo léo nên dễ được lòng mọi người, gặp khó khăn luôn có người giúp đỡ. 
+               Tương lai có thể là người có chức quyền, không lo chuyện chi tiêu.
+               Tuy nhiên, chuyện hôn nhân của bản mệnh lại không quá thuận lợi. 
+               Người này khó tìm được người ưng ý, khi kết hôn vợ chồng dễ mâu thuẫn với nhau, quan hệ với con cái cũng thường không mấy êm đẹp. Có thể kết hôn muộn`,
+        "Sửu": `Là người có chí lớn và có tài cao, nếu đi xa lập nghiệp thì có thể tự gây dựng được thành tựu lớn lao. 
+                Tuy nhiên do bản mệnh ít bạn bè nên mọi việc đều phải dựa vào sức của chính mình, không phụ thuộc được vào người khác.
+                Phương diện tình cảm khá đào hoa, thường nhận được sự quan tâm, chú ý của nhiều người khác giới. 
+                Tuy nhiên bản mệnh cần chú ý giữ mình để không vướng vào những mối quan hệ phức tạp, tranh cãi không đáng có.`,
+        "Dần": `Bản mệnh sinh vào giờ Dần là người gặp nhiều thành công trong sự nghiệp. 
+                Bằng tài năng và sự quyết đoán của mình, bạn thường là người mở lối đi riêng, dẫn lối cho cả tập thể. 
+                Đến tuổi trung niên có thể trở thành người có chức quyền, có nhà cao cửa rộng.
+                Tuy nhiên bản mệnh không nên quá kiêu ngạo với tài năng hoặc với những gì gặt hái được kẻo dễ nảy sinh mâu thuẫn, thị phi với người khác. 
+                Khi có tiền trong tay cũng nhớ tiêu dùng hợp lý, không nên tiêu hoang kẻo không tiết kiệm được tiền`,
+        "Mão": `Bản mệnh sinh giờ Mão là người dũng cảm, quyết đoán, dám nghĩ dám làm, không sợ khó khăn thử thách. 
+                Thuở còn trẻ tuổi bản mệnh phải đối diện với nhiều trắc trở, sự nghiệp không như ý nhưng bạn sẽ dần khẳng định được vị thế của mình, tương lai được người khác nể trọng, khâm phục.
+                 Phương diện tình cảm nhìn chung khá lạnh nhạt, thờ ơ. 
+                 Bản mệnh thường tập trung cho sự nghiệp nên không chú ý đến việc tìm kiếm nửa kia. 
+                 Khi đã lập gia đình cũng thường không có nhiều thời gian cho người thân.`,
+        "Thìn": `Người tuổi Tý sinh giờ Thìn có cuộc sống khá thuận lợi, dù bạn không có chí hướng cao xa cũng không quá quyết tâm cho sự nghiệp.
+                 Bản mệnh có cách đối nhân xử thế khéo léo nên có quan hệ rộng, thường được nhiều người giúp đỡ.
+                 Trong chuyện tình cảm, bản mệnh là người tự tin nên dễ thu hút được ánh mắt của người khác giới.
+                 Bản mệnh cần lý trí hơn trong chuyện tình cảm, không nên vội vàng đến với một người nào đó theo cảm xúc nhất thời, vì như thế quan hệ sẽ không lâu bền.`,
+        "Tỵ": `Người sinh giờ Tị không gặp được nhiều may mắn trong cuộc sống, phải vất vả bươn chải nhiều mới đạt được điều mình mong muốn.
+                 Đặc biệt bản mệnh cần phải thận trọng trong con đường công danh sự nghiệp do bạn dễ phải chịu sự hãm hại của kẻ tiểu nhân.
+                 Bản mệnh cũng cần thay đổi tính xấu của mình là người nghĩ một đằng làm một nẻo.
+                 Một khi đã quyết tâm làm việc gì thì cần cố gắng đến cùng, không nên bỏ cuộc giữa chừng vì như vậy chỉ tốn công tốn sức, thậm chí bỏ lỡ thành công ngay trước mắt.`,
+        
+        "Ngọ": `Người sinh vào giờ Ngọ, bản mệnh là người hào phóng, rộng rãi, có của ăn của để, có tài làm ăn kinh doanh thường không phải lo đến chuyện chi tiêu.
+                Các mối quan hệ rộng rãi cũng giúp bạn dễ gặp người như ý.
+                Tuy nhiên, bản mệnh cần chú ý hơn trong cách nói năng và hành xử của mình, nếu không thường rơi vào cảnh vạ miệng hoặc mang tiếng oan.
+                Điều này có thể gây ảnh hưởng đến danh tiếng hoặc hình ảnh đã gây dựng, khiến vợ chồng hiểu lầm lẫn nhau.`,
+        "Mùi": `Người tuổi Tý sinh giờ Mùi vốn thông minh, nhanh nhẹn, hoạt bát nên nhanh chóng khẳng định được vị thế của mình. Tuy nhiên có thể do quá tự tin mà bản mệnh thường không nghe theo lời khuyên ngăn của người khác, sự nghiệp có lúc thành công rực rỡ nhưng cũng có lúc thất bại triền miên.
+                 Vận trình tình cảm của bản mệnh nhìn chung bình ổn, vợ chồng thấu hiểu và cảm thông cho nhau, cho dù không ngọt ngào, lãng mạn thì cũng đủ gắn kết. Người này sống có trách nhiệm với gia đình nên luôn lo lắng cho các thành viên.`,
+        "Thân": `Người sinh vào giờ Thân gặp khá nhiều may mắn trong cuộc sống. Bản mệnh thông minh, khéo léo nên thường được lòng mọi người, gặp khó khăn có người giúp hóa giải, thường được quý nhân giới thiệu cho những cơ hội đáng quý.
+                 Bạn cũng là người đào hoa, xung quanh không thiếu người theo đuổi. Bạn cần phải chú ý giữ khoảng cách với mọi người xung quanh, nếu không dễ vướng vào những mối quan hệ phức tạp, gây ảnh hưởng đến thanh danh.`,
+        "Dậu": `Bản mệnh sinh ra đã gặp nhiều may mắn, số được hưởng phúc nên cuộc đời thuận buồm xuôi gió, xung quanh không thiếu người nâng đỡ. Khi lập gia đình thì vợ chồng thấu hiểu, con cái đông vui, cuộc sống ấm êm, không phải lo nghĩ nhiều. 
+                 Tuy nhiên, bạn cần phải đề phòng tai nạn sông nước, khi đi xa cũng cần hết sức thận trọng đề phòng những sự cố đáng tiếc. Nếu đi xa lập nghiệp thì bản mệnh sẽ phải bươn chải nhiều, không thể dựa dẫm vào người thân.`,
+        "Tuất": `Người sinh giờ Tuất là người nóng nảy nên dễ mâu thuẫn với người khác, tự gây ra thêm nhiều rắc rối cho bản thân. Bạn cần học cách nhẫn nhịn trong giao tiếp, đôi khi một điều nhịn bằng chín điều lành và lùi một bước để tiến hai bước.
+                 Trong gia đình, bản mệnh cũng nên học cách đặt mình vào vị trí của nửa kia nhiều hơn, không nên đưa ra những yêu cầu mang tính áp đặt cho đối phương. Khi gặp rắc rối, thay vì trút giận lên người thân thì nên học cách trò chuyện, tâm sự`,
+        "Hợi": `Người tuổi Tý sinh giờ Hợi là người thông minh, tài giỏi nhưng không giỏi xây dựng những mối quan hệ xã giao, vì vậy việc gì cũng phải dựa vào sức của chính mình, đề phòng kẻ xấu hãm hại, đến tuổi trung niên mới có chức có quyền.
+                 Người này cũng dễ gặp phải các vấn đề về sức khỏe, vì vậy ngay khi còn trẻ đã cần chăm chỉ rèn luyện thể dục thể thao, khám chữa bệnh định kì, khi đi xa cần chú ý tai nạn, ăn uống cũng cần thận trọng đề phòng ngộ độc hoặc các bệnh về dạ dày, tiêu hóa.`
+            },
+
+    "Sửu": {
+        "Tý": `Xem vận mệnh người tuổi Sửu theo giờ sinh, người tuổi Sửu sinh giờ Tý gặp được nhiều may mắn trong cuộc sống. Đặc biệt nếu kết hôn sớm thì dễ gặp được người phù hợp. Vợ chồng thấu hiểu, giúp đỡ nhau trong cuộc sống, sự nghiệp suôn sẻ, chuyện làm ăn kinh doanh diễn ra thuận lợi. Bản mệnh cũng là người có cách hành xử khéo léo nên có quan hệ xã giao rộng rãi, thường được giúp đỡ khi khó khăn, cuộc đời nhìn chung khá nhàn nhã, càng về già càng được hưởng phúc, con cháu ngoan ngoãn, sum vầy.`,
+
+        "Sửu": "Người tuổi Sửu sinh ra vào thời điểm này là người thông minh, đa tài, có thể nhanh chóng học hỏi và tiếp thu được những kiến thức, kĩ năng trong công việc. Nếu theo nghiệp văn chương, bản mệnh có thể sẽ rất nổi tiếng. Tuy nhiên người này thường có những suy nghĩ tiêu cực, bi quan, dễ suy nghĩ vẩn vơ nên thường gặp nhiều chuyện buồn trong cuộc sống. Hãy học cách tâm sự, san sẻ với mọi người xung quanh để giảm áp lực cho chính mình.",
+
+        "Dần": "Người sinh giờ Dần có tài nhưng không gặp thời, sự nghiệp có thể phải trải qua nhiều khó khăn, thử thách mới gặt hái được thành công như ý muốn, song cũng không có chức tước, địa vị lớn như người khác. Bạn nên học cách suy nghĩ, nhìn nhận dưới góc độ lạc quan hơn, biết hài lòng với những gì mình đang có thì cuộc sống sẽ nhẹ nhõm hơn. Đừng tự so sánh bản thân với người khác rồi lại than thân trách phận, bất mãn, mất động lực cố gắng.",
+
+        "Mão": "Người tuổi Sửu sinh giờ Mão thường hành xử nóng vội, không cân nhắc kĩ nên cuộc đời gặp nhiều trắc trở, nhiều khi vì công việc của mình mà làm ảnh hưởng tới người thân. Các mối quan hệ xã giao cũng thường xuyên vướng phải mâu thuẫn, tranh cãi. Vì vậy, bản mệnh cần điềm tĩnh, tính toán cẩn trọng hơn trước khi tiến hành bất cứ công việc gì. Ngoài ra, hãy học cách đặt mình vào vị trí của người khác để suy nghĩ cho người khác nhiều hơn, đừng hành xử vô tâm, ích kỉ.",
+
+        "Thìn": "Người tuổi Sửu sinh giờ Thìn cũng không gặp được nhiều may mắn trong cuộc sống. Vì quá tin tưởng vào bản thân nên thích làm theo ý mình, cuối cùng hay gặp phải phiền toái, bế tắc trong cuộc sống, ít được người khác giúp đỡ. Người này cần hạ cái tôi của mình xuống để có thể học hỏi từ mọi người xung quanh nhiều hơn. Chịu khó lắng nghe góp ý sẽ giúp bạn sớm nhận ra thiếu sót của bản thân, có hướng sửa đổi để tiến bộ hơn.",
+
+        "Tỵ": "Người tuổi Sửu ra đời vào giờ Tị là người may mắn, cuộc sống gặp được nhiều điều như ý. Bằng tài trí và cách hành xử khéo léo của mình mà bạn dễ dàng phát huy được thế mạnh, thường được cấp trên nâng đỡ để gặt hái thành công. Tuy nhiên, vì phát triển quá nhanh chóng mà bản mệnh khó tránh khỏi bị kẻ xấu bụng ghen ghét. Hãy thận trọng trong việc kết giao bạn bè, không nên tin tưởng quá dễ dàng vào một người nào đó kẻo bị lợi dụng.",
+
+        "Ngọ": "Người sinh giờ Ngọ có tính tình cởi mở, hài hước, có tài xã giao nên xây dựng được các mối quan hệ rộng rãi, đi đâu cũng nhận được sự chú ý. Bản mệnh có số đào hoa nên từ nhỏ đã được nhiều người theo đuổi. Có điều bản mệnh cần chú ý giữ mình, không nên đẩy mình vào những mối quan hệ phức tạp, gây ảnh hưởng đến thanh danh và tổn thương cho người thân. Bạn cũng cần tập trung nhiều hơn cho sự nghiệp, không nên ham vui.",
+
+        "Mùi": "Người tuổi Sửu sinh vào giờ này không gặp được nhiều may mắn trong cuộc sống, làm việc gì cũng phải dựa vào sức của chính mình. Nếu làm việc giấy tờ hoặc kinh tế cần đề phòng dính líu đến pháp luật. Trong gia đình, bản mệnh là người hết lòng với người thân, biết chăm lo, vun vén. Tuy nhiên bản mệnh cần quan tâm chính mình nhiều hơn, tỉnh táo trong các mối quan hệ tình cảm kẻo bị lợi dụng.",
+
+        "Thân": "Người sinh vào giờ Thân là người có số phú quý, được hưởng phúc trời ban, từ nhỏ đã được nhiều người yêu mến, cha mẹ bao bọc, cuộc sống thuận lợi. Lớn lên bản mệnh quyết tâm trong công việc, thường được quý nhân giúp đỡ, tài vận lên như diều gặp gió. Phương diện tình cảm nhìn chung tốt, dễ gặp được người như ý.",
+
+        "Dậu": "Nếu sinh ra vào giờ Dậu, bản mệnh xác định cuộc đời sẽ gặp nhiều gian nan, thử thách. Hãy coi đó là cơ hội để rèn luyện bản thân. Phương diện tài lộc bình thường, chủ yếu đủ ăn đủ tiêu. Nếu làm ăn lớn thì dễ gặp nguy cơ. Bản mệnh nên hài lòng với những gì mình đang có, không nên tìm đường tắt kẻo phải trả giá.",
+
+        "Tuất": "Người sinh giờ Tuất thích hợp đi xa lập nghiệp. Bản mệnh có tài, có quyết tâm nên có thể vượt qua khó khăn, tự mình khẳng định vị thế. Tuy nhiên vì quá tập trung sự nghiệp nên phương diện tình cảm lạnh nhạt, ít khi về nhà. Quan hệ vợ chồng nhìn chung bình ổn, đôi bên thấu hiểu.",
+
+        "Hợi": "Người tuổi Sửu sinh giờ Hợi thường gặp nhiều gian lao, tuổi trẻ khó thảnh thơi. Hãy quyết tâm trong mọi việc, không bỏ cuộc giữa chừng. Bản mệnh cần học cách tin tưởng và dựa vào người khác nhiều hơn, nếu ôm quá nhiều việc dễ lao lực. Trong gia đình, vợ chồng nên chia sẻ với nhau nhiều hơn."
+    },
+
+    "Dần": {
+        
+  "Tý": "Sinh giờ Tý (23-1h). Người tuổi Dần sinh giờ Tý có tính cách nóng vội nên dễ gặp khó khăn, rắc rối không cần thiết. Bản mệnh cần tỉnh táo và lượng sức trước khi làm việc nếu muốn thành công. Trên phương diện tình cảm, bạn có số đào hoa, nhận được sự chú ý của nhiều người nhưng cần giữ sự chung thủy, tránh vướng thị phi.",
+  
+  "Sửu": "Sinh giờ Sửu (1-3h). Người tuổi Dần sinh giờ Sửu thông minh, nhanh nhẹn, học một biết mười, sự nghiệp gặp nhiều may mắn. Bạn có tài giao tiếp, quan hệ rộng, được nhiều người giúp đỡ nên mọi chuyện đều thuận lợi. Khi lập gia đình, dễ tìm được người tâm đầu ý hợp.",
+  
+  "Dần": "Sinh giờ Dần (3-5h). Người sinh giờ Dần thông minh, ham học hỏi, không chịu thua kém, nổi bật từ nhỏ. Khi trưởng thành, có tư tưởng cầu tiến nên sự nghiệp phát triển nhanh. Hợp với làm ăn kinh doanh, dễ trở thành người dẫn đầu trong lĩnh vực của mình.",
+  
+  "Mão": "Sinh giờ Mão (5-7h). Người tuổi Dần sinh giờ Mão đa tình, đào hoa, được yêu mến từ nhỏ. Tuy nhiên cần nghiêm túc trong chuyện tình cảm nếu không dễ lắm mối tối nằm không. Sự nghiệp nhờ quý nhân mà ổn định, tài chính vững vàng, cuộc sống dư dả.",
+  
+  "Thìn": "Sinh giờ Thìn (7-9h). Người tuổi Dần sinh giờ Thìn có chí lớn, dám nghĩ dám làm, tuy có tài nhưng ít gặp quý nhân nên thường phải tự lực cánh sinh. Nhìn chung vẫn có thể gây dựng sự nghiệp vững chắc. Tình cảm hơi lạnh nhạt nhưng có trách nhiệm với gia đình.",
+  
+  "Tị": "Sinh giờ Tị (9-11h). Người tuổi Dần sinh giờ Tị hay gặp trắc trở, làm gì cũng vất vả. Cần giữ tinh thần vững vàng. Trong tình cảm, không nên cả tin, dễ bị lợi dụng. Nên học cách đánh giá người khác chính xác hơn.",
+  
+  "Ngọ": "Sinh giờ Ngọ (11-13h). Người tuổi Dần sinh giờ Ngọ tài trí hơn người, ý kiến sắc bén, sự nghiệp ổn định và thành công từ trẻ. Tình cảm đào hoa, được chú ý nhiều nhưng dễ cả thèm chóng chán, chỉ khi lập gia đình mới chín chắn hơn.",
+  
+  "Mùi": "Sinh giờ Mùi (13-15h). Người tuổi Dần sinh giờ Mùi gặp nhiều may mắn, có quý nhân phù trợ, gặp dữ hóa lành, danh lợi đều có. Chuyện tình cảm êm ấm, dễ gặp người thấu hiểu và đồng hành trong cuộc sống.",
+  
+  "Thân": "Sinh giờ Thân (15-17h). Người tuổi Dần sinh giờ Thân chính trực, thích giúp người, có lý tưởng lớn, hợp làm chính trị hoặc các lĩnh vực cần hoạt động xã hội. Tình duyên nhiều biến động khi trẻ, trưởng thành mới ổn định và biết lo cho gia đình.",
+  
+  "Dậu": "Sinh giờ Dậu (17-19h). Người tuổi Dần sinh giờ Dậu có số phú quý, biết tận dụng thế mạnh nên sự nghiệp thăng tiến nhanh, có địa vị xã hội. Tài chính dư dả, phù hợp làm kinh tế. Tuy nhiên do bận rộn nên ít thời gian dành cho gia đình.",
+  
+  "Tuất": "Sinh giờ Tuất (19-21h). Người sinh giờ Tuất giỏi giang từ trẻ, theo con đường nào cũng đạt thành tựu, có thể làm rạng danh gia tộc. Tình cảm không mấy thuận, đa phần kết hôn muộn, nhưng gia đình ổn định. Tài chính tốt, về già sung túc.",
+  
+  "Hợi": "Sinh giờ Hợi (21-23h). Người tuổi Dần sinh giờ Hợi có tài nhưng vận thăng trầm, thành công không bền nếu không thận trọng. Trong quan hệ xã giao dễ bị hãm hại. Làm kinh tế cần cẩn trọng khi ký kết hợp đồng. Trong gia đình cần đề phòng người thứ ba xen vào."
+    },
+
+    "Mão": {
+        "Tý": `Người tuổi Mão sinh vào khung giờ Tý sẽ có lối sống phóng khoáng, phong lưu. Họ là nhóm người không thích sự bó buộc, khuôn phép. 
+               Do vậy họ dễ dàng thay đổi công việc, tình yêu, hôn nhân. 
+              Tính cách người tuổi mão sinh vào khung giờ này thường cả thèm chóng chán. 
+              Người tuổi mão sinh vào giờ Tý muốn thành công bắt buộc phải nhẫn nại, học cách kiên trì, ý chí.  `,
+        "Sửu": `Người tuổi Mão sinh vào giờ Sửu sẽ phải sống xa nhà mới thành đạt. Hơn nữa ưu điểm của người sinh giờ sửu là kiên trì và sức khỏe. 
+                Do đó nếu bạn sinh vào khung giờ này muốn thành công bắt buộc phải nỗ lực hơn  người bình thường`,
+        "Dần": `Người tuổi mèo sinh giờ Dần thường hay nóng nảy, bộp chột. Họ là người nhân nghĩa nhưng lại xử lý mạnh và không giữ được bí mật. 
+                Do vậy người tuổi mèo ở khung giờ này cần phải học cách kiềm chế, nhẫn nhịn để thành công hơn trong công việc, cuộc sống, gia đạo.`,
+        "Mão": `Người tuổi Mão sinh giờ Mão được giờ sinh. Họ đều là những người tài hoa, xuất chúng và có năng lực vượt trội. 
+                Chính vì sự thông minh hơn người nên họ dễ dàng tạo được sự nghiệp vững chắc.`,
+        "Thìn": `Người tuổi Mão sinh giờ Thìn số phận gặp nhiều trắc trở. Nhưng bản thân họ lại là người có ý chí nên có thể vượt qua được những khó khăn của cuộc sống. 
+                 Nếu sinh ở khung giờ này, họ chịu khó nỗ lực thì cuộc đời của họ càng về sau cuộc đời của họ càng thuận lợi. 
+                 Về trung niên cuộc sống họ thường an nhàn, có của ăn của để`,
+        "Tỵ": `Người tuổi mão sinh giờ Tỵ thuộc chòm sao Dịch Mã, cuộc sống của họ sẽ bôn ba vất vảo. 
+               Bản thân họ cũng khó lòng tìm được người bầu bạn, chia sẻ những buồn vui trong cuộc sống.`,
+        "Ngọ": `Người tuổi mão sinh giờ Ngọ hay bị gặp nguy hiểm, bệnh tật hiểm nghèo. Nếu họ cố gắng vượt qua được thì cuộc đời của họ sẽ rất hạnh phúc.`,
+        "Mùi": `Người tuổi Mão  có được trí tuệ hơn người. Bản chất họ thông minh, có được thành tích học tập tốt. 
+                Trong công việc họ cũng hay đưa ra những ý tưởng sáng tạo nên cũng dễ dàng ở những vị trí cao trong sự nghiệp.`,
+        "Thân": `Người tuổi Mão sinh giờ thân không có nhiều thăng trầm, đảo lộn. Kể cả về sự nghiệp, gia đình họ đều bình ổn, không có thay đổi, đột phá.
+                 Tuy nhiên những người sinh vào giờ Thân phải hết sức chú ý về sức khỏe. Bởi họ dễ mắc những bệnh tự nhiễm. `,
+        "Dậu": `Người tuổi Mão sinh vào giờ Dậu thường gặp những trắc trở trong cuộc sống, sự nghiệp. 
+                Họ sẽ phải tự mình vượt qua những khó khăn của cuộc sống thì lúc về già họ mới được an  nhàn.
+                Đặc biệt người tuổi Mão sinh vào giờ dậu họ cần phải học cách nhường nhịn , hạn chế to tiếng cãi vã. Như vậy họ sẽ gặp nhiều may mắn, phúc đức.`,
+        "Tuất": ` Những người tuổi Mão sinh vào giờ Tuất là khung giờ 19-21 giờ tối. Họ là nhóm người có quyết cao , cũng là người nói là làm, thậm chí làm nhiều hơn nói ạ. 
+                Họ có ý chí chứ không dễ dàng từ bỏ.`,
+        "Hợi": `người tuổi Mão sinh vào giờ Hợi là vất vả nhất. Họ thường không gặp may mắn trong cuộc sống, công việc. 
+               Do vậy khi làm việc gì cũng nên cẩn trọng, chi tiết.`
+    },
+
+    "Thìn": {
+       "Tý": "Sinh giờ Tý (23h-1h). Người sinh giờ Tý có cách đối nhân xử thế khéo léo nên dễ được quý nhân nâng đỡ, sự nghiệp thuận lợi, ngay từ khi còn trẻ đã gây dựng được thành tựu cho riêng mình. Phương diện tài chính hanh thông suôn sẻ, mọi sự cát tường. Tuy nhiên đôi lúc bản mệnh vẫn bị tiểu nhân phá hoại, gièm pha nhằm hạ bệ danh tiếng, nhưng chỉ cần hành xử tỉnh táo thì mọi chuyện đâu sẽ có đó, gặp hung hóa cát.",
+  
+  "Sửu": "Sinh giờ Sửu (1h-3h). Người sinh giờ Sửu có tham vọng lớn lao trong sự nghiệp. Bạn không thích phô trương nhưng làm việc lặng lẽ, sau này có thể gây dựng tiếng vang khiến nhiều người ngưỡng mộ. Đôi khi vẫn vướng thị phi nhưng nhờ cách hành xử lý trí mà mọi chuyện cũng qua đi. Người này thích hợp giữ vị trí lãnh đạo do có tính công tư phân minh.",
+  
+  "Dần": "Sinh giờ Dần (3h-5h). Người tuổi Thìn sinh vào giờ này có số bôn ba, xa quê lập nghiệp. Khi còn trẻ dễ va vấp, cần thận trọng để tránh xôi hỏng bỏng không hoặc bị kẻ xấu hãm hại. Về già hưởng phúc, gia đình êm ấm, con cháu quây quần, dù không giàu sang cũng có của ăn của để.",
+  
+  "Mão": "Sinh giờ Mão (5h-7h). Người sinh giờ này dễ gặp nhiều chuyện không như ý. Sức khỏe kém, hay đau yếu nên tinh thần làm việc không cao, an phận thủ thường, khó theo đuổi điều mình muốn. Bạn không nên đầu hàng số phận mà cần giữ suy nghĩ tích cực, rèn luyện thể lực và sống đúng điều mình mong muốn để cuộc sống ý nghĩa hơn.",
+  
+  "Thìn": "Sinh giờ Thìn (7h-9h). Người sinh vào giờ này thông minh, tài giỏi, phong thái hơn người, vẻ ngoài nổi bật nên có số đào hoa. Trong sự nghiệp, bản mệnh gặp nhiều may mắn, đối diện khó khăn luôn có người giúp đỡ. Dù không có chí lớn vẫn có vị thế nhất định trong tập thể.",
+  
+  "Tị": "Sinh giờ Tị (9h-11h). Người tuổi Thìn sinh giờ này thường nóng nảy, không kiêng dè nên hay vướng thị phi. Dù không gặp họa lớn nhưng vẫn phải thận trọng, tránh chuyện bé xé ra to. Bù lại đường tình duyên tốt đẹp, gia đình hòa thuận, nửa kia thấu tình đạt lý.",
+  
+  "Ngọ": "Sinh giờ Ngọ (11h-13h). Người sinh giờ này tính cách nóng vội, làm việc thiếu suy nghĩ nên cuộc đời thăng trầm. Khi trẻ trải qua nhiều va vấp nhưng đến trung niên mới thành công. Có số phiêu bạt, khó giữ công việc cố định. Tài lộc không hanh thông, cần tránh quyết định vội vàng kẻo hao tài.",
+  
+  "Mùi": "Sinh giờ Mùi (13h-15h). Người sinh giờ Mùi không gặp nhiều may mắn, dễ vướng phiền toái hao tốn tiền. Không có quý nhân trợ giúp nên phải tự lực vượt khó mới thành công. Cần kiên trì, tránh bỏ cuộc giữa chừng. Nếu gặp áp lực nên chia sẻ với người thân kẻo vợ chồng dễ xa cách.",
+  
+  "Thân": "Sinh giờ Thân (15h-17h). Người sinh vào giờ này thông minh, tinh tế, giỏi giao tiếp, quan hệ xã giao rộng rãi. Có tài làm kinh tế nên kinh doanh phát đạt, tiền bạc dồi dào. Tuy nhiên cần thận trọng khi kết giao bạn bè, tránh cho vay bừa bãi hoặc tiêu xài hoang phí để khỏi hao tán.",
+  
+  "Dậu": "Sinh giờ Dậu (17h-19h). Người sinh giờ Dậu có số đào hoa, đi đâu cũng gây chú ý. Cần nghiêm túc hơn trong chuyện tình cảm để tránh rước họa vào thân. Sự nghiệp khá hanh thông, được quý nhân hoặc cấp trên nâng đỡ. Dù vậy vẫn cần làm việc cẩn thận tránh sai sót.",
+  
+  "Tuất": "Sinh giờ Tuất (19h-21h). Người sinh giờ này gặp nhiều may mắn, thường có người giới thiệu cơ hội tốt. Tuy nhiên vẫn cần tự nỗ lực mới có thành công bền vững. Tình cảm êm đềm, vợ chồng yêu thương, cùng nhau vượt qua khó khăn, về già sống bình an hạnh phúc.",
+  
+  "Hợi": "Sinh giờ Hợi (21h-23h). Người tuổi Thìn sinh giờ Hợi cần thận trọng trong mọi việc mới có tài lộc. Xung quanh thường có nguy cơ rình rập, dễ sập bẫy tiểu nhân nếu chủ quan. Trong tình cảm cần tỉnh táo, không nên tin lời ngon ngọt quá nhanh. Khi đầu tư kinh doanh phải kiểm chứng thông tin trước khi dốc vốn."
+},
+
+    "Tỵ": {
+         "Tý": `
+Sinh giờ Tý (23-1h)<br>
+Người tuổi Tị sinh giờ Tý sẽ gặp phải không ít trở ngại trong cuộc sống. Bạn cần phải nhắc nhở mình cố gắng, không ngừng vươn lên thì cuối cùng sẽ tai qua nạn khỏi, thậm chí tìm được cơ hội để khẳng định vị thế.<br>
+Trên phương diện tình cảm, vợ chồng hãy chia sẻ với nhau nhiều chuyện trong cuộc sống để thêm phần thấu hiểu. Có sự ủng hộ và giúp đỡ của người ấy, bạn sẽ có thêm động lực để vươn lên trong sự nghiệp.
+  `,
+
+  "Sửu": `
+Sinh giờ Sửu (1-3h)<br>
+Người sinh vào giờ Sửu có khả năng gây dựng sự nghiệp lớn lao, mưu sự tất thành. Tuy có trở ngại nhưng nhờ tài trí và quyết tâm, bản mệnh vẫn vượt qua được.<br>
+Tuy nhiên không nên quá kiêu căng, tự mãn. Dù ở vị thế nào cũng cần học hỏi để phát triển bản thân.
+  `,
+
+  "Dần": `
+Sinh giờ Dần (3-5h)<br>
+Người sinh giờ Dần có số phú quý, trẻ tuổi đã gặt hái thành tựu, sự nghiệp phát triển mạnh. Thông minh, dám nghĩ dám làm nên thường dẫn đầu xu thế.<br>
+Tài lộc hanh thông nhưng vì quá chú tâm sự nghiệp nên tình cảm đôi lúc lạnh nhạt, thiếu quan tâm.
+  `,
+
+  "Mão": `
+Sinh giờ Mão (5-7h)<br>
+Vận số bình thường, ít sóng gió lớn nhưng cũng không có cơ hội đột phá lớn. Hãy hài lòng với những gì mình có.<br>
+Trong tình cảm là người chăm lo cho gia đình, nên chia sẻ trách nhiệm với người ấy để tránh tự làm mình vất vả.
+  `,
+
+  "Thìn": `
+Sinh giờ Thìn (7-9h)<br>
+Nhã nhặn, khéo ăn nói, quan hệ xã giao rộng rãi. Cuộc sống thuận lợi, hay được bạn tốt giúp đỡ.<br>
+Tình cảm đào hoa, dễ được chú ý. Nếu đã có gia đình cần giữ khoảng cách để tránh thị phi.
+  `,
+
+  "Tị": `
+Sinh giờ Tị (9-11h)<br>
+Tính cách lạnh lùng, không thích xã giao nên ít bạn. Sự nghiệp khó phát triển mạnh, hợp việc độc lập.<br>
+Tài lộc bình ổn, cẩn thận nên tránh thất thoát nhưng cũng dễ bỏ lỡ cơ hội. Tình cảm rụt rè, bị động.
+  `,
+
+  "Ngọ": `
+Sinh giờ Ngọ (11-13h)<br>
+Cởi mở, phóng khoáng, được nhiều người quý mến. Có quý nhân giúp công việc thuận lợi.<br>
+Làm ăn tốt nhờ quan hệ rộng. Nhưng đôi khi quyết định nóng vội dễ gây hao tài, tổn của.
+  `,
+
+  "Mùi": `
+Sinh giờ Mùi (13-15h)<br>
+Chịu khó, không ngại vất vả. Sự nghiệp thăng trầm nhưng không bỏ cuộc. Trung niên mới ổn định.<br>
+Tài lộc không sáng nhưng nhờ cẩn thận nên hạn chế thua lỗ. Sức khỏe tốt, ít tốn tiền chữa bệnh.
+  `,
+
+  "Thân": `
+Sinh giờ Thân (15-17h)<br>
+Năng động, nhanh trí, gặp nhiều may mắn và quý nhân. Sự nghiệp và tài lộc đều có thành quả.<br>
+Tuy vậy cần đề phòng kẻ xấu ghen ghét. Không nên vội tin người, kể cả trong tình cảm.
+  `,
+
+  "Dậu": `
+Sinh giờ Dậu (17-19h)<br>
+Có số giàu sang, tiền bạc dư dả, thiên phú kinh doanh. Lớn lên dễ làm ăn phát đạt.<br>
+Tuy nhiên phải cảnh giác tiểu nhân. Người làm lãnh đạo càng cần tỉnh táo, đừng vì lời nịnh bợ mà sai đường.
+  `,
+
+  "Tuất": `
+Sinh giờ Tuất (19-21h)<br>
+Số phải đi xa lập nghiệp. Hay mất tiền vì nóng vội hoặc thiếu kinh nghiệm. Cần thận trọng khi quyết định.<br>
+Tình cảm chân thành, chung thủy, biết lo cho gia đình. Nhà cửa yên ấm giúp bạn có động lực vươn lên.
+  `,
+
+  "Hợi": `
+Sinh giờ Hợi (21-23h)<br>
+Hợp đi xa lập nghiệp. Thông minh, nhạy bén nên cần tự đứng bằng khả năng của chính mình.<br>
+Tài lộc thời trẻ vất vả, cạnh tranh nhiều. Về già ổn định, đủ đầy. Tình cảm hòa thuận, gia đình biết bao dung.
+  `
+},
+
+    "Ngọ": {
+        "Tý": `
+Người tuổi Ngọ sinh vào giờ này có thể gặp phải nhiều trắc trở, khó khăn trong cuộc sống.<br>
+Tuy nhiên, bạn khôn khéo, có tài ứng biến. Chỉ cần cố gắng vươn lên thì hoàn toàn có thể chuyển bại thành thắng.<br>
+Về tình cảm, bạn có số đào hoa. Nếu đã lập gia đình thì nên giữ khoảng cách để tránh rắc rối.
+  `,
+
+  "Sửu": `
+Bạn là người gặp nhiều may mắn, thường được quý nhân giúp đỡ nên mưu sự dễ thành.<br>
+Cuộc đời nhìn chung nhàn nhã hơn người, tiền bạc rủng rỉnh, làm ăn có lợi thế vượt qua đối thủ.<br>
+Tài lộc hanh thông, hiếm khi phải lo chuyện chi tiêu.
+  `,
+
+  "Dần": `
+Bạn mạnh mẽ, có chí tiến thủ, dám nghĩ dám làm nhưng dễ nóng vội dẫn đến va vấp khi còn trẻ.<br>
+Trung niên trở đi, kinh nghiệm đủ đầy nên sự nghiệp có thể khởi sắc mạnh.<br>
+Không giỏi xã giao nên ít bạn bè, tình cảm trắc trở, thường kết hôn muộn.
+  `,
+
+  "Mão": `
+Người tuổi Ngọ sinh giờ Mão có phúc lộc song hành, cuộc sống vui vẻ, ít nỗi buồn lớn.<br>
+Bạn khéo léo trong cư xử, quan hệ rộng, gặp khó đều có người hỗ trợ.<br>
+Tình duyên thuận lợi, dễ gặp người tâm đầu ý hợp và có gia đình êm ấm.
+  `,
+
+  "Thìn": `
+Số mệnh không tốt, hay gặp rắc rối do bản tính kiêu ngạo và coi thường người khác.<br>
+Cuộc đời dễ rơi vào cô đơn, bất ổn, ít được giúp đỡ.<br>
+Tài chính không ổn định vì thường quyết định nóng vội, tiêu xài thiếu khoa học.
+  `,
+
+  "Tị": `
+Người sinh giờ Tị phải trải qua nhiều thăng trầm rồi mới có thể an ổn.<br>
+Tuổi trẻ bôn ba, tự lực nhiều hơn là nhờ cậy người khác.<br>
+Trong kinh doanh dễ bị lừa, cần thận trọng trong từng quyết định và hạn chế cho vay mượn.
+  `,
+
+  "Ngọ": `
+Bạn có chí lớn, thích tự do, tư duy sáng tạo giúp dễ dàng khẳng định vị thế.<br>
+Tương lai có khả năng vừa có quyền vừa có tiền.<br>
+Tình cảm ổn định vì gặp được người biết thấu hiểu, bao dung.
+  `,
+
+  "Mùi": `
+Bạn thông minh, khéo léo, quan hệ xã giao rộng, dễ thành công trong kinh doanh và sự nghiệp.<br>
+Tuy nhiên, chuyện tình cảm hay suy nghĩ quá mức, dễ nghi ngờ, dẫn đến mâu thuẫn không đáng có.<br>
+Cần học cách tin tưởng hơn vào đối phương.
+  `,
+
+  "Thân": `
+Người sinh giờ Thân có tính cứng cỏi, quyết định rồi là khó ai lay chuyển.<br>
+Dễ nắm giữ chức vụ cao, dẫn dắt được người khác.<br>
+Tài lộc lên xuống thất thường vì giỏi kiếm nhưng không giỏi giữ. Tình cảm đào hoa.
+  `,
+
+  "Dậu": `
+Bạn gặp nhiều may mắn, ít phải lo nghĩ, thường sinh trong gia đình khá giả.<br>
+Nếu có chí tiến thủ sẽ gây dựng được thành công lớn. Nếu an phận vẫn có cuộc sống dư dả.<br>
+Cuộc đời nhìn chung nhẹ nhàng, không phải vất vả nhiều.
+  `,
+
+  "Tuất": `
+Cuộc sống bình ổn, không quá thăng hoa nhưng cũng không gặp quá nhiều trắc trở.<br>
+Trong các mối quan hệ xã giao cần thận trọng để tránh bị lợi dụng.<br>
+Tài chính trung bình, làm ăn lương thiện thì về già có của tích lũy, sống thanh thản.
+  `,
+
+  "Hợi": `
+Bạn có số an nhàn, dễ bằng lòng với thực tại, ít ham danh vọng lớn.<br>
+Tài chính bình ổn, sức khỏe hơi kém nhưng nhờ cát tinh nên tai qua nạn khỏi.<br>
+Tình cảm êm đềm, dễ gặp người hợp tính, gia đình ít mâu thuẫn.
+  `
+},
+
+    "Mùi": {
+        "Tý": `1. Sinh giờ Tý (23-1h)
+
+Người tuổi Mùi sinh vào giờ Tý là người dĩ hòa vi quý, đôi khi dễ tin người nên dễ bị hao tài tốn của, nhưng may mắn nhờ có cát tinh soi chiếu nên việc xấu đều được hóa giải, không gặp phải thách thức nào quá lớn lao.
+
+Van menh nguoi tuoi Mui theo gio sinh
+
+Trên phương diện tình duyên, bản mệnh là người có trách nhiệm với gia đình, thường xây dựng được mái ấm cùng với nửa kia, về già được hưởng phúc, con cháu sum vầy, không phải lo nghĩ nhiều điều.`,
+  
+  "Sửu": `2. Sinh giờ Sửu (1-3h)
+
+Xem vận mệnh người tuổi Mùi theo giờ sinh thấy người sinh giờ này có tính cách nghiêm túc, chỉn chu, làm việc khoa học, không ham hư vinh. Bản mệnh chăm chỉ làm việc, dù không phát triển nhanh chóng nhưng rất ổn định, có thể giữ chức vị khiến nhiều người nể trọng.
+
+Phương diện tình duyên có thể khá tẻ nhạt, bản mệnh cũng không phải là người chủ động trong tình cảm nên cuộc đời không trải qua nhiều mối tình. Tuy nhiên bạn chung thủy, nghiêm túc nên có thể kết hôn muộn nhưng gia đình bền vững.`,
+  
+  "Dần": `3. Sinh giờ Dần (3-5h)
+
+Người tuổi Mùi sinh giờ này có số may mắn, sự nghiệp tấn tới. Ngay từ khi còn nhỏ, bạn đã có mục tiêu phấn đấu rõ ràng, nuôi tham vọng, lớn lên nhanh chóng khẳng định được thế mạnh của bản thân, giữ chức vụ trong tập thể.
+
+Phương diện tài lộc khá dư dả do bản mệnh quyết đoán, dám nghĩ dám làm, thường là người đầu tiên nắm bắt được các cơ hội. Trong gia đình, bạn lại cần thay đổi tính cách áp đặt của mình, nên lắng nghe các thành viên nhiều hơn.`,
+  
+  "Mão": `4. Sinh giờ Mão (5-7h)
+
+Xem vận mệnh người tuổi Mùi theo giờ sinh thấy người này gặp nhiều trắc trở trong cuộc sống, sự nghiệp phải trải qua nhiều phen lên bổng xuống trầm mới có thể thành công. Trong các mối quan hệ xã giao, cần thận trọng trong cách nhìn người kẻo dễ bị lừa gạt.
+
+Người đi theo con đường làm ăn kinh doanh cần chú ý trong lĩnh vực đầu tư, kí kết hợp đồng, nếu không dễ mắc phải sai lầm, phải chịu cảnh thua lỗ. Trong chuyện tình cảm cần nghiêm túc hơn, chớ nên bắt cá hai tay.`,
+  
+  "Thìn": `5. Sinh giờ Thìn (7-9h)
+
+Người sinh ra vào giờ Thìn có số vất vả, nếu đi xa quê hương sẽ thuận lợi, tốt đẹp hơn, sớm ngày khẳng định được vị thế của mình. Có điều bản mệnh làm việc gì cũng cần dựa vào sức mình là chính, khó có thể nhờ cậy người ngoài.
+
+Ngoài ra, bạn cũng cần quan tâm hơn tới phương diện tình cảm của mình, tìm cách cân bằng cuộc sống và sự nghiệp, đừng nên tham công tiếc việc quá, đến mức quên đi cả việc xây dựng hạnh phúc của bản thân.`,
+  
+  "Tị": `6. Sinh giờ Tị (9-11h)
+
+Người tuổi Mùi sinh ra vào giờ Tị cũng thích hợp đi xa lập nghiệp. Nếu xa quê hương, bản mệnh dễ khẳng định được thế mạnh của mình, quen biết được với quý nhân khiến mọi việc hanh thông, suôn sẻ hơn.
+
+Trên phương diện tài lộc, bạn là người tinh tường, khôn khéo nên thường nhận ra trước các nguy cơ và cơ hội. Nếu đi theo con đường làm ăn kinh doanh, dù hơi vất vả một chút nhưng bạn có thể kiếm tiền về đầy túi.
+
+Van menh nguoi tuoi Mui`,
+  
+  "Ngọ": `7. Sinh giờ Ngọ (11-13h)
+
+Xem vận mệnh người tuổi Mùi theo giờ sinh, người sinh vào giờ này gặp nhiều điều may mắn, thuận lợi trong cuộc sống. Bản mệnh có tính cách cởi mở, nhiệt tình nên đi đâu cũng được người yêu mến, dễ được quý nhân nâng đỡ trong sự nghiệp, dù gặp khó khăn cũng tìm được cách khắc phục.
+
+Phương diện tài lộc cũng hanh thông. Người này tinh tường, dám nghĩ dám làm nên dễ trở thành người dẫn đầu xu thế, kiếm tiền về rủng rỉnh. Phương diện tình cảm cũng đào hoa, bạn thường nhận được sự chú ý của nhiều người.`,
+  
+  "Mùi": `8. Sinh giờ Mùi (13-15h)
+
+Nếu sinh vào giờ Mùi, bản mệnh là người rất thông minh, tài năng, đức độ. Ngay từ khi còn trẻ, bạn đã khẳng định được vị thế của mình trong tập thể. Khi đứng ở vị thế lãnh đạo, bạn công tư phân minh nên thường được cấp dưới tôn trọng.
+
+Trong gia đình, bạn là người sống có trách nhiệm, luôn quan tâm đến các thành viên. Vợ chồng hòa thuận, biết lắng nghe và giúp đỡ nhau trong cuộc sống. Về già bản mệnh được hưởng vinh hoa phú quý, hạnh phúc khó ai bằng.`,
+  
+  "Thân": `9. Sinh giờ Thân (15-17h)
+
+Người sinh vào giờ Thân thông minh, sáng tạo, thường đưa ra được nhiều ý tưởng mới mẻ, nhận được sự đồng tình của nhiều người. Bạn tự mình gây dựng sự nghiệp nhưng mọi việc đều thuận lợi, mưu sự tất thành.
+
+Tuy nhiên, trên phương diện tình cảm, bản mệnh cần nghiêm túc hơn, không nên trăng hoa, giữ quan hệ mập mờ với nhiều người cùng lúc. Nếu không nghiêm túc trong tình cảm thì dễ rơi vào cảnh “lắm mối tối nằm không”.`,
+  
+  "Dậu": `10. Sinh giờ Dậu (17-19h)
+
+Người này không gặp nhiều may mắn trong cuộc đời, khi còn trẻ phải trải qua nhiều phen lao đao, vất vả. Vì vậy bạn cần khích lệ bản thân cố gắng, không nên đầu hàng nghịch cảnh, khiến công lao đổ sông đổ bể.
+
+Trong các mối quan hệ xã giao, bạn cần tránh nóng nảy, nói năng hoặc hành xử không suy nghĩ, dễ đẩy mình vào chuyện thị phi, kiện tụng rắc rối. Hãy hạ cái tôi của mình xuống một chút, dĩ hòa vi quý sẽ giúp cuộc sống dễ thở hơn.`,
+  
+  "Tuất": `11. Sinh giờ Tuất (19-21h)
+
+Người tuổi Mùi sinh vào giờ Tuất có tính cách nghiêm túc, chân thành, một khi đã được giao việc gì thì sẽ cố gắng đến cùng. Tuy sự nghiệp của bản mệnh không phát triển nhanh chóng nhưng bạn vẫn có chỗ đứng nhất định trong xã hội.
+
+Tiếc rằng bạn thường gặp phải bất lợi trong hôn nhân, vợ chồng thường xuyên mâu thuẫn hoặc bị kẻ thứ ba chen chân. Hãy quan tâm đến nửa kia của mình nhiều hơn, đồng thời mở lòng để tâm sự với người ấy, kéo gần khoảng cách giữa đôi bên.`,
+  
+  "Hợi": `12. Sinh giờ Hợi (21-23h)
+
+Người sinh vào giờ Hợi cũng sẽ gặp phải nhiều vướng mắc trong cuộc sống khi bị kẻ tiểu nhân quấy phá, cãi cọ liên miên. Hãy thận trọng hơn trong việc kết giao và hành xử để không vô tình quen với bạn xấu, gây ảnh hưởng đến vận trình.
+
+Tuy nhiên, trên thực tế thì bạn là người có tài, chỉ cần phát triển theo đúng định hướng thì ắt gây dựng được tiếng vang cho mình. Hãy tập trung vào phát triển sự nghiệp, tránh lo chuyện bao đồng, rồi mọi việc sẽ dần có khởi sắc.`
+    },
+
+    "Thân": {
+       "Tý": `Người sinh giờ này có số làm ăn buôn bán thành công, tài vận dồi dào. Nếu đi theo quan lộ thì bản mệnh cần đề phòng kẻ tiểu nhân ngáng đường cản trở.`,
+  
+  "Sửu": `Đây là giờ sinh cát lành cho người tuổi Thân. Bản mệnh cả đời không phải lo âu, sầu muộn. Đường công danh, tình duyên, sức khỏe đều rất tốt.`,
+  
+  "Dần": `Tuổi Thân sinh vào giờ Dần tài hoa xuất chúng, thi cử đỗ đạt. Đến khi vào đời, bản mệnh công danh rộng mở nhưng cũng gặp một số trở ngại nhất định.`,
+  
+  "Mão": `Tuổi trẻ là thời gian lập nghiệp, dù gặp gian nan nhưng không đáng ngại. Tuổi già lại càng gặp nhiều vận may hơn, hưởng cuộc sống phú quý cát tường.`,
+  
+  "Thìn": `Bản mệnh tài mạo song toàn, thông minh kiệt xuất. Đường công danh hay làm ăn cũng đều có người giúp đỡ nên cực kỳ suôn sẻ. Dù vậy, cuộc sống nên biết tiết kiệm tiền bạc, tránh tình huống bất ngờ về sau.`,
+  
+  "Tị": `Người sinh giờ này nên lưu ý cẩn trọng trong giao tiếp, ngăn chặn họa từ miệng mà ra. Còn lại, sự nghiệp không có gì đáng ngại, gặp chuyện gian nan cũng có người ra tay tương trợ.`,
+  
+  "Ngọ": `Cuộc sống nhiều chuyện phải lo nghĩ, tính toán cân nhắc sao cho vẹn toàn. Ngoài 30 bản mệnh nhiều may mắn hơn, gia đình thuận hòa, êm ấm.`,
+  
+  "Mùi": `Bản mệnh là người thẳng thắn, bộc trực, có sao nói vậy. Họ cứng cỏi, mạnh mẽ vươn lên, không chịu khuất phục số phận. Nhờ vậy mà được hưởng thành quả tốt đẹp.`,
+  
+  "Thân": `Tuổi Thân lại sinh giờ Thân tài lộc dư thừa, nhiều mối làm ăn tốt. Họ có duyên hợp tác với bạn bè, người thân, cùng nhau làm ăn phấn đấu. Dù vậy, mệnh chủ vẫn nên cẩn trọng khi kết giao các mối quan hệ.`,
+  
+  "Dậu": `Trong đời họ vướng phải nhiều chuyện thị phi rắc rối. Nhưng nhờ tài ăn nói, đầu óc linh hoạt nên họ đều có thể vượt qua, gặp dữ hóa lành.`,
+  
+  "Tuất": `Đây là những người mạnh về đường học tập, thi cử. Bản mệnh có gia đình, bạn bè làm điểm tựa thì bật lên nhanh chóng. Ngược lại, nếu tự phát triển thì phải nỗ lực hơn người mới đạt tới thành công.`,
+  
+  "Hợi": `Cuộc đời những người này thịnh vượng, tích lũy tiền tài của cải, cuộc sống an nhàn hạnh phúc. Tuy nhiên, chính vì vậy mà họ cũng bị kẻ tiểu nhân ganh ghét, đố kỵ.`
+},
+
+    "Dậu": {
+       "Tý": `Do Dậu Kim sinh Tý Thủy nên người tuổi Dậu có thể đạt được thành công nhất định trong sự nghiệp, cuộc sống sung túc đầy đủ. Nhược điểm của người này là không có ý chí kiên cường, không đủ năng lực để đảm nhận việc lớn, lại có tiểu nhân quấy phá nên cũng trải qua thất bại, tổn hao tài sản.`,
+
+  "Sửu": `Người tuổi Dậu sinh vào giờ Sửu gặp nhiều may mắn trong cuộc sống, vật chất đầy đủ, hành xử trượng nghĩa nên được nhiều người yêu mến. Nhưng đôi lúc không tránh khỏi kẻ tiểu nhân hãm hại, ảnh hưởng tới công danh sự nghiệp.`,
+
+  "Dần": `Bản mệnh là người thẳng thắn, trung hậu, luôn cố gắng phấn đấu xây dựng sự nghiệp của mình, không nghĩ tới việc hãm hại người khác. Tuy nhiên, do tính tình có phần nóng nảy nên dễ đắc tội với mọi người xung quanh. Tài chính tích cực nhưng khó làm giàu từ trẻ, phải va vấp nhiều mới tích lũy được kinh nghiệm và đổi đời vào trung niên.`,
+
+  "Mão": `Người sinh giờ này thông minh nhưng độc đoán, thích làm theo ý mình, ít nghe lời khuyên của người khác. Vì vậy thường gặp rắc rối, có lúc bế tắc không tìm được lối ra. Trong tình cảm hay ích kỷ, xem mình là trung tâm, vợ chồng dễ mâu thuẫn.`,
+
+  "Thìn": `Do Thìn Thổ sinh Dậu Kim nên người này có vận số tốt, vật chất dư giả, quyền cao chức trọng. Dù đôi lúc thất bại nhưng tổn thất không lớn. Tính cách ôn hòa, chân thành, hành động nhất quán nhưng đôi khi cố chấp. Khi gặp khó thường có người giúp nên sự nghiệp thuận lợi.`,
+
+  "Tị": `Tỵ Hỏa khắc Dậu Kim nên cuộc đời người này thăng trầm, hạnh phúc và trắc trở song hành. Dễ thành công nhưng cũng dễ thất bại, phải trải qua biến cố mới rèn luyện được bản thân và gặt hái thành tựu lớn.`,
+
+  "Ngọ": `Người sinh giờ Ngọ có ý chí phấn đấu mạnh mẽ, không chịu thua kém ai. Cuộc đời có nhiều bon chen nhưng chỉ cần cố gắng thì sẽ thành công. Trong tình cảm cần bao dung hơn, biết giữ khoảng cách với người khác khi đã có gia đình.`,
+
+  "Mùi": `Người tuổi Dậu sinh giờ Mùi nóng nảy, không kiềm chế được cảm xúc nên hay mâu thuẫn với người xung quanh. Nếu có chức cao thì dễ cậy quyền gây họa. Gia đình cũng không yên ấm vì vợ chồng hay xung đột. Cần thay đổi cách hành xử để tránh tự làm khổ mình.`,
+
+  "Thân": `Sinh giờ này, người tuổi Dậu lương thiện, học giỏi, tự lực tự cường, trung hiếu vẹn toàn. Không quý thì phú, ra ngoài dễ thành đạt, danh tiếng vang xa, hậu vận vinh hoa, cả đời hưởng phúc.`,
+
+  "Dậu": `Vì Dậu Kim sánh đôi nên người này có số làm quan, tài lộc dồi dào. Tuy nhiên cuộc sống nhiều sóng gió và dễ mắc bệnh nhẹ. Dù vậy, sự nghiệp vẫn có cơ hội phát triển mạnh.`,
+
+  "Tuất": `Người sinh giờ này có số xuất ngoại, lập nghiệp nơi xa mới thành. Thường tự lập từ hai bàn tay trắng. Trong tình yêu khá rụt rè, tự ti, dễ gặp trắc trở. Khi lập gia đình thì chung thủy, có trách nhiệm nhưng hay giữ mọi chuyện trong lòng.`,
+
+  "Hợi": `Người sinh giờ Hợi không giỏi xã giao, thích tự làm bằng sức mình. Tài lộc và sự nghiệp bình bình, nếu đi xa lập nghiệp thì sẽ tốt hơn. Trong tình cảm ít chủ động, khó mở lòng, dễ cô đơn. Gia đình vợ chồng dễ lạnh nhạt do thiếu chia sẻ.`
+},
+
+    "Tuất": {
+        "Tý": `Người tuổi Tuất sinh giờ Tý tuy thông minh, nhanh nhạy nhưng số không gặp thời, công việc nhiều bất lợi, dù có tài cũng khó tìm được đất dụng võ. Cuộc sống không quá rực rỡ nhưng chăm chỉ thì vẫn đủ đầy. Trong các mối quan hệ bạn khéo léo, dễ được chú ý. Khi lập gia đình thì sống có trách nhiệm, quan tâm tới mọi người.`,
+
+  "Sửu": `Người sinh giờ Sửu tính cứng đầu, chỉ làm theo điều mình cho là đúng. Cuộc đời dễ gặp chuyện phiền phức nhưng nhờ quý nhân mà yên ổn phần nào. Nếu muốn xây dựng gia đình hòa thuận, bạn cần hạ cái tôi, lắng nghe nhiều hơn, tránh áp đặt hoặc tự quyết mọi thứ.`,
+
+  "Dần": `Sinh giờ Dần, bạn mạnh mẽ, dám nghĩ dám làm, nhưng tuổi trẻ vấp nhiều sóng gió. Tới trung niên vận trình hanh thông hơn, có cơ hội khẳng định vị thế. Tài lộc bình ổn, không quá giàu sang nhưng không thiếu thốn. Nên sống phù hợp với khả năng, tránh chạy theo xu thế.`,
+
+  "Mão": `Người sinh giờ Mão sức khỏe không tốt, dễ mắc bệnh tốn kém. Ngay từ trẻ cần rèn lối sống khoa học. Bù lại, sự nghiệp và tài lộc hanh thông, được quý nhân giúp đỡ, khó khăn dễ hóa giải. Thành tựu không lớn nhưng có chỗ đứng vững vàng.`,
+
+  "Thìn": `Sinh giờ Thìn, cuộc đời nhiều biến động nhưng bạn bản lĩnh, không dễ khuất phục. Dù không giữ vị trí lớn vẫn được người khác nể trọng. Trong tình cảm yêu ghét rõ ràng, chủ động. Trong gia đình luôn trách nhiệm, chăm lo và sẵn sàng hi sinh cho người thân.`,
+
+  "Tị": `Người sinh giờ Tị dễ vướng rắc rối về tài lộc nhưng nhờ cát tinh hỗ trợ mà tai qua nạn khỏi. Không nên làm ăn lớn hay cả tin lời người ngoài. Trong tình cảm nên chủ động hơn, gia đình cần chia sẻ nhiều hơn, đừng giữ mọi chuyện trong lòng.`,
+
+  "Ngọ": `Sinh giờ Ngọ thông minh, quyết đoán, biết nắm bắt cơ hội nên sự nghiệp tiến triển nhanh, dễ có chức quyền. Công việc thuận lợi nên tài sản dư dả, nhưng đôi khi thiếu thận trọng dẫn đến hao tài. Khi làm ăn lớn nên cân nhắc kỹ, nghe góp ý từ người khác.`,
+
+  "Mùi": `Người sinh giờ Mùi biết đối nhân xử thế nên được nhiều người yêu quý, sự nghiệp và tài lộc hanh thông, ít gặp trắc trở. Tuy nhiên trong tình cảm bạn hơi bị động, ít bộc lộ cảm xúc nên dễ cô đơn. Nếu muốn cải thiện thì cần cởi mở hơn.`,
+
+  "Thân": `Sinh giờ Thân nuôi chí lớn từ nhỏ, lớn lên mạnh mẽ và độc lập. Nếu lập nghiệp xa quê thì càng dễ thành công, danh lợi hài hòa. Tình cảm thì cần thận trọng vì có nhiều đối tượng tiếp cận, tránh sa vào thị phi gây ảnh hưởng danh tiếng.`,
+
+  "Dậu": `Người sinh giờ Dậu sức khỏe kém, thường xuyên đau ốm từ nhỏ nên cần chăm sóc kỹ, tránh làm việc quá sức hoặc suy nghĩ tiêu cực. Sự nghiệp bình ổn, không cạnh tranh nhiều, làm việc tỉ mỉ nên được tin tưởng. Tài chính không quá tốt vì tốn kém cho sức khỏe.`,
+
+  "Tuất": `Người sinh giờ Tuất tư tưởng tiến bộ, tích cực nhưng không gặp thời nên phải trải qua nhiều vất vả. Nhờ tính kiên cường nên trung niên sẽ gặt hái thành công. Tài chính không dư dả nhưng đủ sống, không phải dựa vào ai. Tình cảm hòa thuận, vợ chồng thấu hiểu và hỗ trợ nhau.`,
+
+  "Hợi": `Người sinh giờ Hợi có tiền đồ sáng, dễ thành công trong sự nghiệp và tài lộc, đặc biệt tốt nếu lập nghiệp xa nhà. Tình cảm lại khá lạnh nhạt vì ít để tâm chuyện yêu đương. Khi có gia đình thì nên chia sẻ gánh nặng, nói chuyện nhiều hơn để giữ hòa khí.`
+    },
+    
+
+    "Hợi": {
+        "Tý": "Người tuổi Hợi sinh vào giờ Tý thường có diện mạo nổi bật, thông minh, đa tài nên rất có sức lôi cuốn người khác giới. Xung quanh bạn chẳng bao giờ thiếu các đối tượng tiếp cận, đường tình duyên đào hoa nở rộ. Trên phương diện sự nghiệp, bản mệnh thường được quý nhân nâng đỡ, đồng nghiệp yêu mến nên phát triển hanh thông, có thể gặt hái được thành tựu đáng ngưỡng mộ. Phương diện tài lộc cũng dư dả, nếu theo nghiệp buôn bán thì đắt khách.",
+
+  "Sửu": "Người tuổi Hợi sinh giờ Sửu có tham vọng trong sự nghiệp, luôn phấn đấu hết mình để đạt được mục tiêu, thậm chí không tiếc hi sinh. Tuy nhiên, cách hành xử của bạn đôi khi không được lòng mọi người. Tình cảm không sâu sắc, trong gia đình dễ áp đặt, hay xảy ra tranh cãi, ít có lúc hạnh phúc trọn vẹn.",
+
+  "Dần": "Sinh giờ Dần, bạn mạnh mẽ, dám nghĩ dám làm nhưng tính nóng nảy, dễ đắc tội. Có xu hướng coi thường người khác nên không hợp môi trường tập thể, khó làm nên việc lớn. Trong nhà, bạn đôi khi ích kỉ, cần xem lại cách hành xử để không làm tổn thương người thân.",
+
+  "Mão": "Người tuổi Hợi sinh giờ Mão có vận may lớn, thường được quý nhân giúp đỡ, được lãnh đạo nâng đỡ, làm việc gì cũng hanh thông, tài lộc dồi dào. Đối nhân xử thế tốt nên được yêu mến, đường tình duyên cũng đào hoa. Khi lập gia đình cần biết giữ khoảng cách, tránh rắc rối tình cảm.",
+
+  "Thìn": "Sinh giờ Thìn, bạn ham vị thế, thích khen ngợi nên dễ mắc sai lầm nếu bị tiểu nhân tâng bốc. Tính đào hoa mạnh, cần giữ sự chung thủy. Tài lộc khá nhưng cần tránh tiêu xài hoang phí, đua đòi kẻo dễ lâm cảnh khó khăn.",
+
+  "Tị": "Người tuổi Hợi sinh giờ Tị gặp nhiều may mắn, hợp làm ăn kinh doanh, dễ phát tài vì có tầm nhìn và quyết sách đúng đắn. Trong gia đình, bạn sống tốt, giàu trách nhiệm, cư xử khéo léo với mọi người. Về già thường sung túc, ấm áp.",
+
+  "Ngọ": "Sinh giờ Ngọ, bạn quyết đoán, không sợ gian khó, sớm khẳng định vị thế. Tuy nhiên tính cả thèm chóng chán cần sửa đổi. Tài lộc khá nhưng chi tiêu thiếu kiểm soát khiến tiền đến rồi đi nhanh. Cần cẩn trọng kẻo hao tài.",
+
+  "Mùi": "Người sinh giờ Mùi thông minh, đa tài nhưng không gặp thời, cuộc đời nhiều vất vả do bị ganh ghét. Dù của cải không tích lũy nhiều nhưng biết chi tiêu hợp lý nên vẫn đủ đầy. Trong gia đình sống tình cảm, về già hưởng phúc.",
+
+  "Thân": "Người sinh giờ Thân khéo léo, có tài ăn nói, hợp kinh doanh và dễ phát tài. Đường tình duyên nhiều vệ tinh, trải qua nhiều mối tình và thường kết hôn muộn. Khi lập gia đình cần sống trách nhiệm, chín chắn hơn.",
+
+  "Dậu": "Sinh giờ Dậu, bạn có cơ hội giữ vị thế cao nhưng cũng dễ bị tiểu nhân quấy phá, nên cẩn trọng trong hành xử. Tài lộc khởi sắc mạnh, biết quyết định đúng lúc. Tuy nhiên cạnh tranh lớn, làm việc khá vất vả.",
+
+  "Tuất": "Người tuổi Hợi sinh giờ Tuất hòa nhã, thích yên ổn, không tranh đấu. Không nổi bật nhưng được tin cậy giao việc. Tài chính bình bình nhưng bạn biết hài lòng nên cuộc sống vui vẻ. Gia đình hòa thuận, viên mãn.",
+
+  "Hợi": "Sinh giờ Hợi phải trải qua nhiều thăng trầm sự nghiệp, cần thận trọng kết giao bạn bè để tránh bị lợi dụng hoặc cướp công. Trong tình cảm, bạn chân thành, thẳng thắn, được yêu mến. Sống có trách nhiệm với gia đình, quan tâm người thân hết lòng."
+    }
+};
+
+    
+
+function getChiFromResNam() {
+    const text = document.getElementById("res-nam").textContent.trim();
+    const parts = text.split(" ");        // Ví dụ: "Giáp Tuất"
+    return parts[1] || "";                // Trả về "Tuất"
+}
+
+function getChiFromResGio() {
+    const text = document.getElementById("res-gio").textContent.trim();
+    const parts = text.split(" ");        // Ví dụ: "Mậu Dần"
+    return parts[1] || "";                // Trả về "Dần"
+}
+
+function xuLyGioSinhTheoTuoi() {
+    const chiNam = getChiFromResNam();     // Ví dụ: "Tuất"
+    const chiGio = getChiFromResGio();     // Ví dụ: "Dần"
+
+    const noiDung =
+        gioSinhTheoTuoi[chiNam]?.[chiGio] || "Không có dữ liệu.";
+
+    document.getElementById("ketQuaGioTheoTuoi").innerHTML = noiDung;
+   
+}
+function hienChi() {
+    const chiNam = getChiFromResNam();
+    const chiGio = getChiFromResGio();
+
+    document.getElementById("chi-nam1").textContent = chiNam;
+    document.getElementById("chi-gio1").textContent = chiGio;
+}
+
+xuLyGioSinhTheoTuoi();
+hienChi();
+
+/////////////////////////////////////////////////////////////////
+        // 4. Hiển thị Can Chi, Ngũ Hành, Tàng Can
+        const canChiData = out.pillars.map((p, i) => {
+            const [can, chi] = p.split(' ');
+            // Can Ngũ Hành
+            document.getElementById(`can-${ids[i]}`).innerHTML = `${can}<br><span style="font-size: smaller; color: gray;">${CAN_NGUHANH[can] || ""}</span>`;
+            // Chi Ngũ Hành
+            document.getElementById(`chi-${ids[i]}`).innerHTML = `${chi}<br><span style="font-size: smaller; color: gray;">${CHI_NGUHANH[chi] || ""}</span>`;
+            // Tàng Can
+            document.getElementById(`tangcan-${ids[i]}`).innerHTML =
+                (TANG_CAN[chi] || [])
+                    .map(tc => `${tc} <span style="font-size: smaller; color: gray;">${CAN_NGUHANH[tc] || ""}</span>`)
+                    .join("<br>");
+
+            return { can, chi, tangCan: TANG_CAN[chi] || [] };
+        });
+
+        // 5. Hiển thị Thập Thần và Trường Sinh
+        function hienThiThapThan(nhatCan, canChiData) {
+            for (let i = 0; i < ids.length; i++) {
+                const { can, chi, tangCan } = canChiData[i];
+                // Thập Thần của Thiên Can Trụ
+                document.getElementById(`than-can-${ids[i]}`).textContent = getThapThan(nhatCan, can) || "";
+                // Thập Thần của Tàng Can
+                if (tangCan.length > 0) {
+                    const list = tangCan.map(tc => `${getThapThan(nhatCan, tc)}`).join("<br>");
+                    document.getElementById(`than-tangcan-${ids[i]}`).innerHTML = list;
+                } else {
+                    document.getElementById(`than-tangcan-${ids[i]}`).textContent = "";
+                }
+                // Vị trí 12 Trường Sinh
+                document.getElementById(`truong-sinh-${ids[i]}`).textContent = tinhTrangSinh(nhatCan, chi) || "";
+            }
+        }
+        hienThiThapThan(nhatCan, canChiData);
+        hienThiViTriTruongSinh(nhatCan);
+
+        // 6. Tính và hiển thị Cân Lượng
+        tinhCanLuong(out, lunar, gioChi);
+
+        // ... trong function tinhTuTru()
+        
+// 7. Tính và hiển thị Chòm Sao VÀ TƯƠNG HỢP
+const zodiacResult = getZodiacSign(Number(m), Number(d));
+const compatibilityData = getZodiacCompatibility(zodiacResult.name); // Tra cứu dữ liệu tương hợp
+
+document.getElementById("constellation-name").textContent = zodiacResult.name;
+document.getElementById("constellation-date-range").textContent = zodiacResult.range;
+
+// Hiển thị dữ liệu tương hợp
+if (compatibilityData) {
+    document.getElementById("zodiac-element").textContent = compatibilityData.element;
+
+// Tách các cung bằng dấu phẩy, rồi cho mỗi cung xuống dòng
+document.getElementById("zodiac-love").innerHTML = compatibilityData.love
+  .split(',')
+  .map(cung => `<div>${cung.trim()}</div>`)
+  .join('');
+
+document.getElementById("zodiac-work").innerHTML = compatibilityData.work
+  .split(',')
+  .map(cung => `<div>${cung.trim()}</div>`)
+  .join('');
+
+document.getElementById("zodiac-conflict").innerHTML = compatibilityData.conflict
+  .split(',')
+  .map(cung => `<div>${cung.trim()}</div>`)
+  .join('');
+
+document.getElementById("compatibility-details").style.display = 'table';
+} else {
+     document.getElementById("compatibility-details").style.display = 'none';
+}
+
+// 8. Hiển thị phần kết quả chung
+document.getElementById("constellation-result").style.display = 'block';
+document.querySelector('.result-box').style.display = 'block';
+//...
+        // 8. Hiển thị phần kết quả chung
+        document.getElementById("constellation-result").style.display = 'block';
+        document.querySelector('.result-box').style.display = 'block';
+    }
+
+
+    // =========================================================================
+    // V. KHỞI TẠO (INITIALIZATION)
+    // =========================================================================
+
+    document.addEventListener("DOMContentLoaded", function () {
+        // Ẩn kết quả ban đầu
+        document.getElementById("constellation-result").style.display = 'none';
+        document.querySelector('.result-box').style.display = 'none';
+
+        // Gán HÀM CHÍNH vào nút bấm (Chỉ gán một lần duy nhất)
+        document.getElementById("calc").addEventListener("click", tinhTuTru);
+    });
+
+    </script>
+</body>
+</html>
